@@ -1,7 +1,7 @@
 #ifndef LIST_H
 #define LIST_H
 
-typedef double elem_t;
+typedef const char* elem_t;
 
 static int Piccounter = 1;
 

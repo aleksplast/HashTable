@@ -46,10 +46,10 @@ int ListGraphDump(struct List* list, char reason[], int line)
     for (int i = 0; i < list->size + 1; i++)
     {
         if (index == list->fictelem)
-            fprintf(pic, "\t\"box%d\" [shape = \"record\", style = \"filled\", fillcolor = \"yellow\", label = \"{index = %d|ptr = %p|val = %.0lf|prev = %p|next = %p}\"]\n",             \
+            fprintf(pic, "\t\"box%d\" [shape = \"record\", style = \"filled\", fillcolor = \"yellow\", label = \"{index = %d|ptr = %p|val = %.0s|prev = %p|next = %p}\"]\n",             \
             i, i, index, index->val, index->prev, index->next);
         else
-            fprintf(pic, "\t\"box%d\" [shape = \"record\", style = \"filled\", fillcolor = \"green\", label = \"{index = %d|ptr = %p|val = %.0lf|prev = %p|next = %p}\"]\n",             \
+            fprintf(pic, "\t\"box%d\" [shape = \"record\", style = \"filled\", fillcolor = \"green\", label = \"{index = %d|ptr = %p|val = %.0s|prev = %p|next = %p}\"]\n",             \
             i, i, index, index->val, index->prev, index->next);
         index = index->next;
     }
@@ -200,8 +200,12 @@ Node* FindElemByLogicIndex(struct List* list, int logicindex)
 
 int ListDetor(struct List* list)
 {
-    free(list->fictelem);
+    while (HEAD != TAIL)
+    {
+        DeleteElement(list, TAIL);
+    }
 
+    free(list->fictelem);
     list->size = -1;
 
     return NOERR;

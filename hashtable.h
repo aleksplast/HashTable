@@ -1,17 +1,52 @@
 #ifndef HASHTABLE_H
 #define HASHTABLE_H
 
-#include "../List/Simplelist.h"
+#include "./include/SimpleList.h"
+
+#define LISTTAIL fictelem->prev
+#define LISTHEAD fictelem->next
 
 struct HashTable
 {
-    List* table;
+    List** table;
     int size;
     int (*function)(const char*);
 };
 
-int HashTableCtor(HashTable* hashtable, int (*func)(const char*), int sizetable);
+enum SearchStatus
+{
+    SEARCH_FAILURE,
+    SEARCH_SUCCESS,
+};
 
-int HashReturn1(const char* input);
+//-------------- MAIN HASH TABLE FUNC --------------//
+
+int HashTableCtor(HashTable* hashtable, unsigned int (*func)(const char*), int sizetable);
+
+int HashTableDtor(HashTable* hashtable);
+
+int AddMember(HashTable* hashtable, const char* input);
+
+SearchStatus FindByHash(HashTable* hashtable, int hash, const char* input);
+
+//-------------- HASH FUNC --------------//
+
+unsigned int HashReturn1(const char* input);
+
+unsigned int HashReturnFirstASCII(const char* input);
+
+unsigned int HashReturnSumASCII(const char* input);
+
+unsigned int HashReturnLen(const char* input);
+
+unsigned int MurMurHash(const char* data);
+
+unsigned int RolHash(const char* input);
+
+unsigned int RolFunc(int input, int shift);
+
+unsigned int RorHash(const char* input);
+
+unsigned int RorFunc(int input, int shift);
 
 #endif //HASHTABLE_H

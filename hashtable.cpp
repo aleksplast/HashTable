@@ -1,43 +1,70 @@
 #include "hashtable.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <assert.h>
 
-int HashTableCtor(HashTable* hashtable, int (*func)(const char*), int sizetable)
+
+int HashTableCtor(HashTable* hashtable, unsigned int (*func)(const char*), int sizetable)
 {
+    DBG assert(hashtable == NULL);
+
     hashtable->function = func;
     hashtable->size = sizetable;
-    hashtable->table = (List*) calloc(sizetable, sizeof(List));
+    hashtable->table = (List**) calloc(sizetable, sizeof(List*));
 
     for (int i = 0; i < sizetable; i++)
     {
-        ListCtor(&hashtable->table[i], "graphlog.txt");
+        hashtable->table[i] = (List*) calloc(1, sizeof(List));
+        ListCtor(hashtable->table[i], "graphlog.txt");
     }
 
     return NOERR;
 }
 
-int HashReturn1(const char* input)
+int HashTableDtor(HashTable* hashtable)
 {
-    return 1;
-}
+    DBG assert(hashtable == NULL);
 
-int HashReturnFirstASCII(const char* input)
-{
-    return input[0];
-}
-
-int HashReturnLen(const char* input)
-{
-    return strlen(input);
-}
-
-int HashReturnSumASCII(const char* input)
-{
-    int sum = 0;
-
-    for (int i = 0; input[i] != '\0'; i++)
+    for (int i = 0; i < hashtable->size; i++)
     {
-        sum += input[i];
+        ListDetor(hashtable->table[i]);
     }
 
-    return sum;
+    hashtable->size = -1;
+    hashtable->function = NULL;
+    free(hashtable->table);
+    hashtable->table = NULL;
+
+    return NOERR;
 }
 
+int AddMember(HashTable* hashtable, const char* input)
+{
+    DBG assert(hashtable == NULL);
+    DBG assert(input == NULL);
+
+    int hash = hashtable->function(input) % hashtable->size;
+    InsertElementAfterIndex(hashtable->table[hash], hashtable->table[hash]->LISTTAIL, input);
+
+    return NOERR;
+}
+
+SearchStatus FindByHash(HashTable* hashtable, int hash, const char* input)
+{
+    DBG assert(hashtable == NULL);
+    DBG assert(input == NULL);
+
+    Node* curelem = hashtable->table[hash]->LISTTAIL;
+    Node* fictelement = hashtable->table[hash]->fictelem;
+
+    while (curelem != fictelement)
+    {
+        if (strcmp(curelem->val, input) == 0)
+            return SEARCH_SUCCESS;
+        curelem = curelem->prev;
+    }
+
+    return SEARCH_FAILURE;
+}
