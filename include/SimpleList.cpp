@@ -4,8 +4,8 @@
 
 #include "SimpleList.h"
 
-//#define DEBUG
-#ifndef DEBUG
+#define DEBUG
+#ifdef DEBUG
 #define DBG if(true)
 #else
 #define DBG if(false)
@@ -116,11 +116,11 @@ Node* InsertElementAfterIndex(struct List* list, Node* index, elem_t val)
 {
     Node* newelem = (Node*) calloc(1, sizeof(Node));
 
-    DBG printf("index = %p, next = %p, prev = %p\n", index, index->next, index->prev);
+//    DBG printf("index = %p, next = %p, prev = %p\n", index, index->next, index->prev);
     newelem->val = val;
     newelem->next = index->next;
     newelem->prev = index;
-    DBG printf("next = %p, prev = %p\n", newelem->next, newelem->prev);
+//    DBG printf("next = %p, prev = %p\n", newelem->next, newelem->prev);
     index->next = newelem;
 
     if (index == TAIL)
@@ -129,7 +129,7 @@ Node* InsertElementAfterIndex(struct List* list, Node* index, elem_t val)
         newelem->next = list->fictelem;
     }
 
-    DBG printf("next = %p, prev = %p", newelem->next, newelem->prev);
+//    DBG printf("next = %p, prev = %p", newelem->next, newelem->prev);
 
     list->size++;
 

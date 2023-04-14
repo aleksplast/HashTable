@@ -2,6 +2,7 @@
 #define HASHTABLE_H
 
 #include "./include/SimpleList.h"
+#include "./include/text-sort.h"
 
 #define LISTTAIL fictelem->prev
 #define LISTHEAD fictelem->next
@@ -10,7 +11,7 @@ struct HashTable
 {
     List** table;
     int size;
-    int (*function)(const char*);
+    unsigned int (*function)(const char*);
 };
 
 enum SearchStatus
@@ -25,9 +26,11 @@ int HashTableCtor(HashTable* hashtable, unsigned int (*func)(const char*), int s
 
 int HashTableDtor(HashTable* hashtable);
 
-int AddMember(HashTable* hashtable, const char* input);
+int HashTableAdd(HashTable* hashtable, const char* input);
 
 SearchStatus FindByHash(HashTable* hashtable, int hash, const char* input);
+
+int HashTableLoad(HashTable* hashtable, char** words);
 
 //-------------- HASH FUNC --------------//
 

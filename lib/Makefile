@@ -1,7 +1,7 @@
 CC := g++ -Wno-pointer-arith
 SRCSIMP := simplemain.cpp SimpleList.cpp
 DIR := ~/code/HashTable/lib
-SRC := main.cpp hashtable.cpp hashfunc.cpp ~/code/HashTable/include/SimpleList.cpp
+SRC := ~/code/HashTable/main.cpp ~/code/HashTable/hashtable.cpp ~/code/HashTable/hashfunc.cpp ~/code/HashTable/include/SimpleList.cpp ~/code/HashTable/include/text-sort.cpp
 
 .PHONY: all clean
 

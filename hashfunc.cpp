@@ -32,9 +32,9 @@ unsigned int RolHash(const char* input)
 {
     unsigned int hash = 0;
 
-    while (*input != '\0')
+    for (int i = 0; input[i] != '\0'; i++)
     {
-        hash = RolFunc(*input) ^ input[i];
+        hash = RolFunc(*input, 1) ^ input[i];
     }
 
     return hash;
@@ -49,9 +49,9 @@ unsigned int RorHash(const char* input)
 {
     unsigned int hash = 0;
 
-    while (*input != '\0')
+    for (int i = 0; input[i] != '\0'; i++)
     {
-        hash = RolFunc(*input) ^ input[i];
+        hash = RolFunc(*input, 1) ^ input[i];
     }
 
     return hash;

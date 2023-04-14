@@ -8,7 +8,7 @@
 
 int HashTableCtor(HashTable* hashtable, unsigned int (*func)(const char*), int sizetable)
 {
-    DBG assert(hashtable == NULL);
+    DBG assert(hashtable != NULL);
 
     hashtable->function = func;
     hashtable->size = sizetable;
@@ -25,7 +25,7 @@ int HashTableCtor(HashTable* hashtable, unsigned int (*func)(const char*), int s
 
 int HashTableDtor(HashTable* hashtable)
 {
-    DBG assert(hashtable == NULL);
+    DBG assert(hashtable != NULL);
 
     for (int i = 0; i < hashtable->size; i++)
     {
@@ -40,10 +40,10 @@ int HashTableDtor(HashTable* hashtable)
     return NOERR;
 }
 
-int AddMember(HashTable* hashtable, const char* input)
+int HashTableAdd(HashTable* hashtable, const char* input)
 {
-    DBG assert(hashtable == NULL);
-    DBG assert(input == NULL);
+    DBG assert(hashtable != NULL);
+    DBG assert(input != NULL);
 
     int hash = hashtable->function(input) % hashtable->size;
     InsertElementAfterIndex(hashtable->table[hash], hashtable->table[hash]->LISTTAIL, input);
@@ -53,8 +53,8 @@ int AddMember(HashTable* hashtable, const char* input)
 
 SearchStatus FindByHash(HashTable* hashtable, int hash, const char* input)
 {
-    DBG assert(hashtable == NULL);
-    DBG assert(input == NULL);
+    DBG assert(hashtable != NULL);
+    DBG assert(input != NULL);
 
     Node* curelem = hashtable->table[hash]->LISTTAIL;
     Node* fictelement = hashtable->table[hash]->fictelem;
@@ -67,4 +67,17 @@ SearchStatus FindByHash(HashTable* hashtable, int hash, const char* input)
     }
 
     return SEARCH_FAILURE;
+}
+
+int HashTableLoad(HashTable* hashtable, char** words)
+{
+    DBG assert(hashtable != NULL);
+    DBG assert(words != NULL);
+
+    for (int i = 0; words[i] != NULL; i++)
+    {
+        HashTableAdd(hashtable, words[i]);
+    }
+
+    return NOERR;
 }

@@ -3,7 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <assert.h>
-#include <sys\stat.h>
+#include <sys/stat.h>
 
 #include "text-sort.h"
 

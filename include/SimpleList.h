@@ -1,5 +1,6 @@
 #ifndef LIST_H
 #define LIST_H
+#include "common.h"
 
 typedef const char* elem_t;
 
@@ -47,12 +48,6 @@ Node* DeleteElement(struct List* list, Node* index);
 Node* FindElemByLogicIndex(struct List* list, int logicindex);
 
 int ListDetor(struct List* list);
-
-enum SysErrors
-{
-    NOERR       = 0,
-    MEMERR      = 1,
-};
 
 enum ListErrors
 {

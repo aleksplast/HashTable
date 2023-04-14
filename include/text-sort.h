@@ -1,5 +1,7 @@
 #ifndef TEXTSORT_H
 #define TEXTSORT_H
+#include "common.h"
+#include <stdio.h>
 
 //!--------------------------------
 //! @brief Used for determining file size
@@ -97,15 +99,6 @@ struct poem
     struct line* Strings;   ///<Array of structures, containing strings
 };
 
-//!--------------------------------
-//! @brief Used for indicating of appeared error
-//!--------------------------------
-enum Errors
-{
-    NOERR = 0,      ///<No errors occured
-    INPUTERROR,     ///<Error with input file
-    MEMERROR,       ///<Error with memory
-    FILERROR        ///<Error with file
-};
+typedef struct poem Text;
 
 #endif //TEXTSORT_H
