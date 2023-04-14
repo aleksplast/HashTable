@@ -24,6 +24,32 @@ Here are 7 different hash functions we will use later:
 3. Function, that returns lenght of the word.
 4. Function, that returns sum of ASCII codes of the letters in the word.
 5. Function, that uses $rol$ command from assembler.
+'''
+unsigned int RolHash(const char* input)
+{
+    unsigned int hash = 0;
+
+    for (int i = 0; input[i] != '\0'; i++)
+    {
+        hash = RolFunc(hash, 1) ^ input[i];
+    }
+
+    return hash;
+}
+'''
 6. Function, that uses $ror$ command from assembler.
+'''
+unsigned int RorHash(const char* input)
+{
+    unsigned int hash = 0;
+
+    for (int i = 0; input[i] != '\0'; i++)
+    {
+        hash = RorFunc(hash, 1) ^ input[i];
+    }
+
+    return hash;
+}
+'''
 7. MurMurHash (google it, if you don't know).
 8. (Not done yet) CRC hash (again, google it).
