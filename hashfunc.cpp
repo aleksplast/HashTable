@@ -42,7 +42,7 @@ unsigned int RolHash(const char* input)
 
 unsigned int RolFunc(int input, int shift)
 {
-    return (input << shift) | (input >> (sizeof (unsigned int) - shift));
+    return (input << shift) | (input >> (sizeof (int) - shift));
 }
 
 unsigned int RorHash(const char* input)
