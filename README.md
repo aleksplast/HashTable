@@ -15,11 +15,12 @@ We will test 7 different hash functions in the first part, then the best one we 
 
 # Chapter I: different hash functions
 
-## Descriptions:
+Let's take a look at different hash functions, for each one we will look at the amount of collisions in each list.
 
-Here are 7 different hash functions we will use later:
+### Function, that always returns 1
 
-1. Function, that always returns 1
+~~~C++
+
 2. Function, that returns ASCII code of the first letter.
 3. Function, that returns lenght of the word.
 4. Function, that returns sum of ASCII codes of the letters in the word.
