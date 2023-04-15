@@ -34,7 +34,7 @@ unsigned int RolHash(const char* input)
 
     for (int i = 0; input[i] != '\0'; i++)
     {
-        hash = RolFunc(*input, 1) ^ input[i];
+        hash = RolFunc(hash, 1) ^ input[i];
     }
 
     return hash;
@@ -51,7 +51,7 @@ unsigned int RorHash(const char* input)
 
     for (int i = 0; input[i] != '\0'; i++)
     {
-        hash = RolFunc(*input, 1) ^ input[i];
+        hash = RorFunc(hash, 1) ^ input[i];
     }
 
     return hash;
@@ -59,7 +59,7 @@ unsigned int RorHash(const char* input)
 
 unsigned int RorFunc(int input, int shift)
 {
-    return (input >> shift) | (input << (sizeof (unsigned int) - shift));
+    return (input >> shift) | (input << (sizeof (int) - shift));
 }
 
 unsigned int MurMurHash(const char* data)
