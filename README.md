@@ -51,6 +51,7 @@ unsigned int HashReturnLen(const char* input)
 
 Plot for this one:
 <img align="center"  src="https://github.com/aleksplast/HashTable/blob/main/lib/StrlenStat.png">
+Dispersion: 
 
 Still not as good as we want.
 
@@ -72,6 +73,7 @@ unsigned int HashReturnSumASCII(const char* input)
 And here comes the plot:
 
 <img align="center"  src="https://github.com/aleksplast/HashTable/blob/main/lib/ASCIIsum.png">
+Dispersion: 0.3615
 
 This one looks decent, but we can make better.
 
@@ -93,6 +95,7 @@ unsigned int RolHash(const char* input)
 ROL plot:
 
 <img align="center"  src="https://github.com/aleksplast/HashTable/blob/main/lib/Rolstat.png">
+Dispersion: 0.0068
 
 ### Function, that uses $ror$ command from assembler.
 ~~~C++
@@ -112,6 +115,7 @@ unsigned int RorHash(const char* input)
 ROR plot:
 
 <img align="center"  src="https://github.com/aleksplast/HashTable/blob/main/lib/Rorstat.png">
+Dispersion: 0.007
 
 ### MurMurHash (google it, if you don't know).
 
@@ -119,6 +123,7 @@ Plot for this one looking good:
 
 <img align="center"  src="https://github.com/aleksplast/HashTable/blob/main/lib/MurMurStat.png">
 
+Dispersion: 0.00424
 This onr is the best so far. Now lets take a look at final function.
 
 ### (Not done yet) CRC hash (again, google it).
