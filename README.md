@@ -25,8 +25,10 @@ unsigned int HashReturn1(const char* input)
     return 1;
 }
 ~~~
-
 Here are the plot for this function:
+<img align="center"  src="https://github.com/aleksplast/HashTable/blob/main/lib/Return%201%20stat.png">
+
+This is the ugliest thing i've seen in my life.
 
 ### Function, that returns ASCII code of the first letter.
 ~~~C++
@@ -35,9 +37,10 @@ unsigned int HashReturnFirstASCII(const char* input)
     return input[0];
 }
 ~~~
-
 Here are the plot:
+<img align="center"  src="https://github.com/aleksplast/HashTable/blob/main/lib/FirstASCII%20stat.png">
 
+This one looks not as ugly as a previous one, but it still is.
 ### Function, that returns lenght of the word.
 ~~~C++
 unsigned int HashReturnLen(const char* input)
@@ -47,6 +50,9 @@ unsigned int HashReturnLen(const char* input)
 ~~~
 
 Plot for this one:
+<img align="center"  src="https://github.com/aleksplast/HashTable/blob/main/lib/StrlenStat.png">
+
+Still not as good as we want.
 
 ### Function, that returns sum of ASCII codes of the letters in the word.
 ~~~C++
@@ -65,6 +71,10 @@ unsigned int HashReturnSumASCII(const char* input)
 
 And here comes the plot:
 
+<img align="center"  src="https://github.com/aleksplast/HashTable/blob/main/lib/ASCIIsum.png">
+
+This one looks decent, but we can make better.
+
 ### Function, that uses $rol$ command from assembler.
 ~~~C++
 unsigned int RolHash(const char* input)
@@ -81,6 +91,8 @@ unsigned int RolHash(const char* input)
 ~~~
 
 ROL plot:
+
+<img align="center"  src="https://github.com/aleksplast/HashTable/blob/main/lib/Rolstat.png">
 
 ### Function, that uses $ror$ command from assembler.
 ~~~C++
@@ -99,9 +111,15 @@ unsigned int RorHash(const char* input)
 
 ROR plot:
 
+<img align="center"  src="https://github.com/aleksplast/HashTable/blob/main/lib/Rorstat.png">
+
 ### MurMurHash (google it, if you don't know).
 
 Plot for this one looking good:
+
+<img align="center"  src="https://github.com/aleksplast/HashTable/blob/main/lib/MurMurStat.png">
+
+This onr is the best so far. Now lets take a look at final function.
 
 ### (Not done yet) CRC hash (again, google it).
 
