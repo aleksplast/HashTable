@@ -26,6 +26,10 @@ int main()
     char statfile6[50] = "Rorstat.csv";
     char statfile7[50] = "MurMurstat.csv";
     char statfile8[50] = "MurMurAsm.csv";
+    char statfile9[50] = "MurMurAsm.csv";
+    char* amongus1 = "AMONGUS";
+    char* amongus2 = "AMONGUS";
+    char* bebra = "BEBRA";
 
     Text input = {};
     Words text = {};
@@ -118,7 +122,7 @@ int StressTable(Words* array, HashTable* table)
         for (int j = 0; j < array->num; j++)
         {
 //            printf("Expected = %d, Gain = %d\n", MurMurHash(array->words[j]), MurMur(array->words[j]));
-            FindByHashAVX(table, array->words[j]);
+            FindByHash(table, array->words[j]);
         }
     }
 

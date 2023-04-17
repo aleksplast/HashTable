@@ -65,8 +65,11 @@ SearchStatus FindByHash(HashTable* hashtable, const char* input)
 
     while (curelem != fictelement)
     {
-        if (strcmp(curelem->val, input) == 0)
+        if (strcmp_asm(curelem->val, input) == 0)
+        {
+//            printf("To find = %s, found = %s\n", input, curelem->val);
             return SEARCH_SUCCESS;
+        }
         curelem = curelem->prev;
     }
 
@@ -103,7 +106,7 @@ SearchStatus FindByHashAVX(HashTable* hashtable, const char* input)
         __m256i curcontent = _mm256_loadu_si256((__m256i*) curelem->val);
         __m256i cmpmask = _mm256_cmpeq_epi8(curcontent, content);
 
-        unsigned int mask = _mm256_testnzc_si256(cmpmask);
+        unsigned int mask = _mm256_movemask_epi8(cmpmask);
 
         if (mask == 0xFFFFFFFF)
         {
@@ -115,4 +118,32 @@ SearchStatus FindByHashAVX(HashTable* hashtable, const char* input)
     }
 
     return SEARCH_FAILURE;
+}
+
+int strcmp_asm (const char* str1, const char* str2)
+{
+    int result = 0;
+    asm(".intel_syntax noprefix\n\t"
+        "mov rsi, %1\n\t"
+        "mov rdi, %2\n\t"
+        "Next:\n"
+            "mov r11b, byte ptr [rsi]\n"
+            "mov r10b, byte ptr [rdi]\n"
+    	    "cmp r10b, 0\n"
+    	    "je done\n"
+    	    "cmp r11b, 0\n"
+    	    "je done\n"
+    	    "cmp r11b, r10b\n"
+    	    "jne done\n"
+    	    "inc rdi\n"
+    	    "inc rsi\n"
+    	    "jmp Next\n"
+        "done:\n"
+            "movzx rax, r10b\n"
+            "movzx rbx, r11b\n"
+    	    "sub rax, rbx\n"
+        ".att_syntax"
+        : "=r" (result) : "r" (str1), "r" (str2) : "rbx", "r11", "r10", "rsi", "rdi"
+    );
+    return result;
 }

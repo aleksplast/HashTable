@@ -58,4 +58,6 @@ unsigned int MurMur(const char* input);
 
 extern "C" inline unsigned int MurMurHashAsm (const char* input, int len);
 
+int strcmp_asm (const char* str1, const char* str2);
+
 #endif //HASHTABLE_H
