@@ -28,9 +28,11 @@ int HashTableDtor(HashTable* hashtable);
 
 int HashTableAdd(HashTable* hashtable, const char* input);
 
-SearchStatus FindByHash(HashTable* hashtable, int hash, const char* input);
+SearchStatus FindByHash(HashTable* hashtable, const char* input);
 
 int HashTableLoad(HashTable* hashtable, char** words);
+
+SearchStatus FindByHashAVX(HashTable* hashtable, const char* input);
 
 //-------------- HASH FUNC --------------//
 
@@ -51,5 +53,7 @@ unsigned int RolFunc(int input, int shift);
 unsigned int RorHash(const char* input);
 
 unsigned int RorFunc(int input, int shift);
+
+extern "C" inline uint32_t MurMurHashAsm (const char* key);
 
 #endif //HASHTABLE_H

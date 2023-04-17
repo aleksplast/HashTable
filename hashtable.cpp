@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <assert.h>
+#include <immintrin.h>
 
 
 int HashTableCtor(HashTable* hashtable, unsigned int (*func)(const char*), int sizetable)
@@ -30,6 +31,7 @@ int HashTableDtor(HashTable* hashtable)
     for (int i = 0; i < hashtable->size; i++)
     {
         ListDetor(hashtable->table[i]);
+        free(hashtable->table[i]);
     }
 
     hashtable->size = -1;
@@ -51,12 +53,14 @@ int HashTableAdd(HashTable* hashtable, const char* input)
     return NOERR;
 }
 
-SearchStatus FindByHash(HashTable* hashtable, int hash, const char* input)
+SearchStatus FindByHash(HashTable* hashtable, const char* input)
 {
     DBG assert(hashtable != NULL);
     DBG assert(input != NULL);
 
-    Node* curelem = hashtable->table[hash]->LISTTAIL;
+    int hash = hashtable->function(input) % hashtable->size;
+
+    Node* curelem = hashtable->table[hash]->fictelem->prev;
     Node* fictelement = hashtable->table[hash]->fictelem;
 
     while (curelem != fictelement)
@@ -80,4 +84,35 @@ int HashTableLoad(HashTable* hashtable, char** words)
     }
 
     return NOERR;
+}
+
+SearchStatus FindByHashAVX(HashTable* hashtable, const char* input)
+{
+    DBG assert(hashtable != NULL);
+    DBG assert(hashtable != NULL);
+
+    int hash = hashtable->function(input) % hashtable->size;
+
+    Node* curelem = hashtable->table[hash]->fictelem->prev;
+    Node* fictelement = hashtable->table[hash]->fictelem;
+
+    __m256i content = _mm256_loadu_si256((__m256i*) input);
+
+    while (curelem != fictelement)
+    {
+        __m256i curcontent = _mm256_loadu_si256((__m256i*) curelem->val);
+        __m256i cmpmask = _mm256_cmpeq_epi8(curcontent, content);
+
+        unsigned int mask = _mm256_movemask_epi8(cmpmask);
+
+        if (mask == 0xFFFFFFFF)
+        {
+//            printf("To find = %s, found = %s\n", input, curelem->val);
+            return SEARCH_SUCCESS;
+        }
+
+        curelem = curelem->prev;
+    }
+
+    return SEARCH_FAILURE;
 }

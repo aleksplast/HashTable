@@ -11,6 +11,8 @@
 #define DBG if(false)
 #endif
 
+int balls = 0;
+
 int ListCtor(struct List* list, char* graphlog)
 {
     list->size = 0;
@@ -178,7 +180,7 @@ Node* DeleteElement(struct List* list, Node* index)
     index->prev->next = index->next;
 
     free(index);
-
+    balls++;
     list->size--;
 
     return index;
@@ -204,6 +206,9 @@ int ListDetor(struct List* list)
     {
         DeleteElement(list, TAIL);
     }
+
+    if (HEAD != list->fictelem)
+        free(HEAD);
 
     free(list->fictelem);
     list->size = -1;

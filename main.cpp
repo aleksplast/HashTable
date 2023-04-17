@@ -1,11 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <time.h>
 #include "hashtable.h"
 
-char** SplitTextIntoWords(char* text);
+struct Words
+{
+    char** words;
+    int num;
+};
+
+int SplitTextIntoWords(Words* array, char* text);
 int WordsCount(char* text);
 int Statistics(HashTable* hashtable, char* filename);
+int StressTable(Words* array, HashTable* table);
 
 int main()
 {
@@ -19,31 +27,38 @@ int main()
     char statfile7[50] = "MurMurstat.csv";
 
     Text input = {};
+    Words text = {};
     TextReader(filename, &input, "r");
-    char** words = SplitTextIntoWords(input.ptr);
+    SplitTextIntoWords(&text, input.ptr);
 
     HashTable table = {};
-    HashTableCtor(&table, *RolHash, 1000);
+    HashTableCtor(&table, *MurMurHash, 1000);
 
-    HashTableLoad(&table, words);
-    Statistics(&table, statfile5);
+    HashTableLoad(&table, text.words);
+
+    clock_t start = clock();
+    StressTable(&text, &table);
+    clock_t end = clock();
+
+    double time = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("Elapsed time = %lg\n", time);
 
     HashTableDtor(&table);
-    free(words);
-    printf("DONE\n");
+    free(text.words);
+
     return 0;
 }
 
-char** SplitTextIntoWords(char* text)
+int SplitTextIntoWords(Words* array, char* text)
 {
     DBG assert(text != NULL);
-    int wordsnum = WordsCount(text);
+    array->num = WordsCount(text);
 
-    char** words = (char**) calloc(wordsnum + 1, sizeof(char*));        // last pointer will be NULL for easier use later
+    array->words = (char**) calloc(array->num + 1, sizeof(char*));        // last pointer will be NULL for easier use later
     int cur = 0;
     if (text[0] != ' ')
     {
-        words[cur++] = text;
+        array->words[cur++] = text;
     }
 
     for (int i = 0; text[i] != '\0'; i++)
@@ -51,13 +66,13 @@ char** SplitTextIntoWords(char* text)
         if (text[i] == ' ')
         {
             text[i] = '\0';
-            words[cur++] = text + i + 1;
+            array->words[cur++] = text + i + 1;
         }
     }
 
-    words[cur] = NULL;
+    array->words[cur] = NULL;
 
-    return words;
+    return NOERR;
 }
 
 int WordsCount(char* text)
@@ -90,6 +105,19 @@ int Statistics(HashTable* hashtable, char* filename)
     }
 
     fclose(file);
+
+    return NOERR;
+}
+
+int StressTable(Words* array, HashTable* table)
+{
+    for (int i = 0; i < 10000; i++)
+    {
+        for (int j = 0; j < array->num; j++)
+        {
+            FindByHashAVX(table, array->words[j]);
+        }
+    }
 
     return NOERR;
 }
