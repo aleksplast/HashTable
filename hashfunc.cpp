@@ -105,3 +105,12 @@ unsigned int MurMurHash(const char* data)
 
     return hash;
 }
+
+unsigned int MurMur(const char* input)
+{
+    int len = strlen(input);
+
+    unsigned int hash = MurMurHashAsm(input, len);
+
+    return hash;
+}

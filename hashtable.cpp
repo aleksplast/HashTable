@@ -101,9 +101,8 @@ SearchStatus FindByHashAVX(HashTable* hashtable, const char* input)
     while (curelem != fictelement)
     {
         __m256i curcontent = _mm256_loadu_si256((__m256i*) curelem->val);
-        __m256i cmpmask = _mm256_cmpeq_epi8(curcontent, content);
 
-        unsigned int mask = _mm256_movemask_epi8(cmpmask);
+        unsigned int mask = _mm256_testnzc_si256(content, curcontent);
 
         if (mask == 0xFFFFFFFF)
         {

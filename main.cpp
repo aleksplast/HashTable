@@ -25,6 +25,7 @@ int main()
     char statfile5[50] = "Rolstat.csv";
     char statfile6[50] = "Rorstat.csv";
     char statfile7[50] = "MurMurstat.csv";
+    char statfile8[50] = "MurMurAsm.csv";
 
     Text input = {};
     Words text = {};
@@ -32,9 +33,10 @@ int main()
     SplitTextIntoWords(&text, input.ptr);
 
     HashTable table = {};
-    HashTableCtor(&table, *MurMurHash, 1000);
+    HashTableCtor(&table, *MurMur, 1000);
 
     HashTableLoad(&table, text.words);
+    Statistics(&table, statfile8);
 
     clock_t start = clock();
     StressTable(&text, &table);
@@ -115,6 +117,7 @@ int StressTable(Words* array, HashTable* table)
     {
         for (int j = 0; j < array->num; j++)
         {
+//            printf("Expected = %d, Gain = %d\n", MurMurHash(array->words[j]), MurMur(array->words[j]));
             FindByHashAVX(table, array->words[j]);
         }
     }

@@ -54,6 +54,8 @@ unsigned int RorHash(const char* input);
 
 unsigned int RorFunc(int input, int shift);
 
-extern "C" inline uint32_t MurMurHashAsm (const char* key);
+unsigned int MurMur(const char* input);
+
+extern "C" inline unsigned int MurMurHashAsm (const char* input, int len);
 
 #endif //HASHTABLE_H

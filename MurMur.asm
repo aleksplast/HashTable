@@ -6,68 +6,60 @@ global MurMurHashAsm
 ; rsi = len
 
 MurMurHashAsm:
-        push r12
-        push rbx
 
-        xor rbx, rbx            ; seed
-        mov r12, 0x5bd1e995     ; base
+        mov ebx, esi            ; seed ^ lenght
+        xor eax, eax
 
-        xor rbx, rsi
+.Next:  imul eax, dword [rdi], BASE     ; curr *= base
+        mov ecx, eax
+        shr ecx, 24             ; curr >> shift
 
-.Next:  mov rax, [rdi]          ; curr = buffer
+        xor eax, ecx            ; curr ^= curr >> shift
 
-        mul r12
-        mov r10, rax
-        shl r10, 24
+        imul ebx, ebx, BASE     ; hash *= base
+        xor ebx, eax            ; hash ^= curr
+        add rdi, 4              ; buffer += 4
+        sub rsi, 4              ; lenght -= 4
 
-        xor rax, r12
-        xchg rax, rbx
+        cmp rsi, 4              ; while (lenght >= 4)
+        jge .Next
 
-        mul r12
-        xor rax, rbx
-        add rdi, 4
-        sub rsi, 4
-        mov rbx, rax
-
-        cmp rsi, 4
-        jae .Next
-
-        mov rax, rbx
-        xor rbx, rbx
+        mov eax, ebx            ; hash in rax
+        xor ebx, ebx
 
         cmp rsi, 3
         je .Three
         cmp  rsi, 2
         je .Two
 
-        mov bl, byte [rdi]
-        xor rax, rbx
-        mul r12
         jmp .Done
 
-.Three: mov bl, byte [rdi + 2]
-        xor rbx, 16
-        xor rax, rbx
+.Three: movzx ebx, byte [rdi + 2]  ; buffer[2]
+        sal ebx, 16             ; buffer[2] << 16
+        xor eax, ebx            ; hash ^= buffer[2] << 16
+        xor ebx, ebx
 
-        jmp .Done
 
-.Two:   mov bl, byte [rdi + 1]
-        shl rbx, 8
-        xor rax, rbx
+.Two:   movzx ebx, byte [rdi + 1]  ; buffer[1]
+        sal ebx, 8              ; buffer[1] << 8
+        xor eax, ebx            ; hash ^= buffer[1] << 8
+        xor ebx, ebx
 
-        jmp .Done
+.Done:  movzx ebx, byte [rdi]      ; buffer[0]
+        xor ebx, ebx            ; hash ^= buffer[0]
+        imul eax, eax, BASE     ; hash *= r12
 
-.Done:  mov rbx, rax
-        shl rax, 13
-        xor rax, rbx
+        mov ebx, eax            ; hash in rbx
+        shr ebx, 13             ; hash >> 13
+        xor eax, ebx            ; hash ^= hash >> 13
 
-        mul r12
-        mov rbx, rax
-        shl rbx, 15
-        xor rax, rbx
-
-        pop rbx
-        pop r12
+        imul eax, eax, BASE     ; hash *= base
+        mov ebx, eax            ; hash in rbx
+        shr ebx, 15             ; hash >> 15
+        xor eax, ebx            ; hash ^= hash >> 15
 
         ret
 
+.data
+
+BASE equ 0x5bd1e995
