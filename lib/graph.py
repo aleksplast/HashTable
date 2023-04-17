@@ -5,7 +5,7 @@ import pandas as pd
 x = []
 y = []
 
-with open ("ASCIIsumstat.csv", "r") as f:
+with open ("MurMurstat.csv", "r") as f:
     for line in f:
         line = line.split(";")
         x = line
@@ -20,7 +20,8 @@ for i in range(len(x)):
     x[i] = int(x[i])
 for i in range(len(x)):
     y.append(i)
-print(x)
+
+print(np.std(x)/sum(x))
 
 plt.bar(y,x)
 
