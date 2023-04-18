@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <time.h>
+#include <string.h>
+#include <immintrin.h>
 #include "hashtable.h"
 
 int SplitTextIntoWords(Words* array, Text* text);
@@ -11,7 +13,7 @@ int StressTable(Words* array, HashTable* table);
 
 int main()
 {
-    char filename[50] = "HamletFormated.txt";
+    char filename[50] = "Hamlet16.txt";
     char statfile1[50] = "Return1Stat.csv";
     char statfile2[50] = "FirstASCIIstat.csv";
     char statfile3[50] = "ASCIIsumstat.csv";
@@ -26,13 +28,13 @@ int main()
     Words text = {};
     TextReader(filename, &input, "r");
     SplitTextIntoWords(&text, &input);
-
-    HashTable table = {};
-    HashTableCtor(&table, *MurMurHash, 1000);
-
-    HashTableLoad(&table, &text);
-    Statistics(&table, statfile8);
-
+//
+     HashTable table = {};
+     HashTableCtor(&table, *MurMur, 1000);
+//
+     HashTableLoad(&table, &text);
+     Statistics(&table, statfile8);
+//
     clock_t start = clock();
     StressTable(&text, &table);
     clock_t end = clock();
@@ -51,22 +53,14 @@ int main()
 int SplitTextIntoWords(Words* array, Text* text)
 {
     DBG assert(text != NULL);
-    array->num = WordsCount(text);
+    array->num = text->size / 16;
 
-    array->words = (char**) calloc(array->num, sizeof(char*));        // last pointer will be NULL for easier use later
-    int cur = 0;
-    if (text->ptr[0] != ' ')
-    {
-        array->words[cur++] = text->ptr;
-    }
+    array->words = (__m128i*) calloc(array->num, sizeof(__m128i));
 
-    for (int i = 0; i < text->size; i++)
+    for (int i = 0; i < text->size / 16; i += 1)
     {
-        if (text->ptr[i] == ' ')
-        {
-            text->ptr[i] = '\0';
-            array->words[cur++] = text->ptr + i + 1;
-        }
+        __m128i cur = _mm_loadu_si64(text->ptr + i * 16);
+        array->words[i] = cur;
     }
 
     return NOERR;
@@ -113,7 +107,6 @@ int StressTable(Words* array, HashTable* table)
         for (int j = 0; j < array->num; j++)
         {
 //            printf("Expected = %d, Gain = %d\n", MurMurHash(array->words[j]), MurMur(array->words[j]));
-            if (array->words[j] != NULL)
                 FindByHash(table, array->words[j]);
         }
     }

@@ -1,8 +1,9 @@
 #ifndef LIST_H
 #define LIST_H
 #include "common.h"
+#include <immintrin.h>
 
-typedef const char* elem_t;
+typedef __m128i elem_t;
 
 static int Piccounter = 1;
 

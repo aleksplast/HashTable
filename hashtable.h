@@ -3,6 +3,7 @@
 
 #include "./include/SimpleList.h"
 #include "./include/text-sort.h"
+#include <immintrin.h>
 
 #define LISTTAIL fictelem->prev
 #define LISTHEAD fictelem->next
@@ -11,7 +12,7 @@ struct HashTable
 {
     List** table;
     int size;
-    unsigned int (*function)(const char*);
+    unsigned int (*function)(__m128i);
 };
 
 enum SearchStatus
@@ -22,19 +23,19 @@ enum SearchStatus
 
 struct Words
 {
-    char** words;
+    __m128i* words;
     int num;
 };
 
 //-------------- MAIN HASH TABLE FUNC --------------//
 
-int HashTableCtor(HashTable* hashtable, unsigned int (*func)(const char*), int sizetable);
+int HashTableCtor(HashTable* hashtable, unsigned int (*func)(__m128i), int sizetable);
 
 int HashTableDtor(HashTable* hashtable);
 
-int HashTableAdd(HashTable* hashtable, const char* input);
+int HashTableAdd(HashTable* hashtable, __m128i input);
 
-SearchStatus FindByHash(HashTable* hashtable, const char* input);
+SearchStatus FindByHash(HashTable* hashtable, __m128i input);
 
 int HashTableLoad(HashTable* hashtable, Words* array);
 
@@ -60,9 +61,9 @@ unsigned int RorHash(const char* input);
 
 unsigned int RorFunc(int input, int shift);
 
-unsigned int MurMur(const char* input);
+unsigned int MurMur(__m128i input);
 
-extern "C" inline unsigned int MurMurHashAsm (const char* input, int len);
+extern "C" inline unsigned int MurMurHashAsm (char* input, int len);
 
 int strcmp_asm (const char* str1, const char* str2);
 

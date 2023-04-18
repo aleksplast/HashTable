@@ -7,7 +7,7 @@
 #include <immintrin.h>
 
 
-int HashTableCtor(HashTable* hashtable, unsigned int (*func)(const char*), int sizetable)
+int HashTableCtor(HashTable* hashtable, unsigned int (*func)(__m128i), int sizetable)
 {
     DBG assert(hashtable != NULL);
 
@@ -42,10 +42,9 @@ int HashTableDtor(HashTable* hashtable)
     return NOERR;
 }
 
-int HashTableAdd(HashTable* hashtable, const char* input)
+int HashTableAdd(HashTable* hashtable, __m128i input)
 {
     DBG assert(hashtable != NULL);
-    DBG assert(input != NULL);
 
     int hash = hashtable->function(input) % hashtable->size;
     InsertElementAfterIndex(hashtable->table[hash], hashtable->table[hash]->LISTTAIL, input);
@@ -53,10 +52,9 @@ int HashTableAdd(HashTable* hashtable, const char* input)
     return NOERR;
 }
 
-SearchStatus FindByHash(HashTable* hashtable, const char* input)
+SearchStatus FindByHash(HashTable* hashtable, __m128i input)
 {
     DBG assert(hashtable != NULL);
-    DBG assert(input != NULL);
 //    printf("input = %s\n", input);
 
     int hash = hashtable->function(input) % hashtable->size;
@@ -67,11 +65,11 @@ SearchStatus FindByHash(HashTable* hashtable, const char* input)
 
     while (curelem != fictelement)
     {
-        if (strcmp(curelem->val, input) == 0)
-        {
-//            printf("To find = %s, found = %s\n", input, curelem->val);
-            return SEARCH_SUCCESS;
-        }
+       if (_mm_testnzc_si128(curelem->val, input) == 0)
+       {
+//           printf("To find = %s, found = %s\n", input, curelem->val);
+           return SEARCH_SUCCESS;
+       }
         curelem = curelem->prev;
     }
 
@@ -89,37 +87,6 @@ int HashTableLoad(HashTable* hashtable, Words* array)
     }
 
     return NOERR;
-}
-
-SearchStatus FindByHashAVX(HashTable* hashtable, const char* input)
-{
-    DBG assert(hashtable != NULL);
-    DBG assert(hashtable != NULL);
-
-    int hash = hashtable->function(input) % hashtable->size;
-
-    Node* curelem = hashtable->table[hash]->fictelem->prev;
-    Node* fictelement = hashtable->table[hash]->fictelem;
-
-    __m256i content = _mm256_loadu_si256((__m256i*) input);
-
-    while (curelem != fictelement)
-    {
-        __m256i curcontent = _mm256_loadu_si256((__m256i*) curelem->val);
-        __m256i cmpmask = _mm256_cmpeq_epi8(curcontent, content);
-
-        unsigned int mask = _mm256_movemask_epi8(cmpmask);
-
-        if (mask == 0xFFFFFFFF)
-        {
-//            printf("To find = %s, found = %s\n", input, curelem->val);
-            return SEARCH_SUCCESS;
-        }
-
-        curelem = curelem->prev;
-    }
-
-    return SEARCH_FAILURE;
 }
 
 int inline strcmp_asm (const char* str1, const char* str2)
