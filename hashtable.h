@@ -20,6 +20,12 @@ enum SearchStatus
     SEARCH_SUCCESS,
 };
 
+struct Words
+{
+    char** words;
+    int num;
+};
+
 //-------------- MAIN HASH TABLE FUNC --------------//
 
 int HashTableCtor(HashTable* hashtable, unsigned int (*func)(const char*), int sizetable);
@@ -30,7 +36,7 @@ int HashTableAdd(HashTable* hashtable, const char* input);
 
 SearchStatus FindByHash(HashTable* hashtable, const char* input);
 
-int HashTableLoad(HashTable* hashtable, char** words);
+int HashTableLoad(HashTable* hashtable, Words* array);
 
 SearchStatus FindByHashAVX(HashTable* hashtable, const char* input);
 

@@ -6,6 +6,7 @@ global MurMurHashAsm
 ; rsi = len
 
 MurMurHashAsm:
+        push rbx
 
         mov ebx, esi            ; seed ^ lenght
         xor eax, eax
@@ -58,6 +59,7 @@ MurMurHashAsm:
         shr ebx, 15             ; hash >> 15
         xor eax, ebx            ; hash ^= hash >> 15
 
+        pop rbx
         ret
 
 .data

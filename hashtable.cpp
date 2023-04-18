@@ -57,11 +57,13 @@ SearchStatus FindByHash(HashTable* hashtable, const char* input)
 {
     DBG assert(hashtable != NULL);
     DBG assert(input != NULL);
+//    printf("input = %s\n", input);
 
     int hash = hashtable->function(input) % hashtable->size;
 
     Node* curelem = hashtable->table[hash]->fictelem->prev;
     Node* fictelement = hashtable->table[hash]->fictelem;
+//    printf("curelem = %p, fictelem = %p, input = %p\n", curelem, fictelement, input);
 
     while (curelem != fictelement)
     {
@@ -76,14 +78,14 @@ SearchStatus FindByHash(HashTable* hashtable, const char* input)
     return SEARCH_FAILURE;
 }
 
-int HashTableLoad(HashTable* hashtable, char** words)
+int HashTableLoad(HashTable* hashtable, Words* array)
 {
     DBG assert(hashtable != NULL);
-    DBG assert(words != NULL);
+    DBG assert(array != NULL);
 
-    for (int i = 0; words[i] != NULL; i++)
+    for (int i = 0; i < array->num; i++)
     {
-        HashTableAdd(hashtable, words[i]);
+        HashTableAdd(hashtable, array->words[i]);
     }
 
     return NOERR;
@@ -120,7 +122,7 @@ SearchStatus FindByHashAVX(HashTable* hashtable, const char* input)
     return SEARCH_FAILURE;
 }
 
-int strcmp_asm (const char* str1, const char* str2)
+int inline strcmp_asm (const char* str1, const char* str2)
 {
     int result = 0;
     asm(".intel_syntax noprefix\n\t"
@@ -143,7 +145,7 @@ int strcmp_asm (const char* str1, const char* str2)
             "movzx rbx, r11b\n"
     	    "sub rax, rbx\n"
         ".att_syntax"
-        : "=r" (result) : "r" (str1), "r" (str2) : "rbx", "r11", "r10", "rsi", "rdi"
+        : "=r" (result) : "r" (str1), "r" (str2) : "rax", "rbx", "rsi", "rdi", "r10", "r11"
     );
     return result;
 }
