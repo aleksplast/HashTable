@@ -105,3 +105,21 @@ unsigned int MurMurHash(const char* data)
 
     return hash;
 }
+
+unsigned int CRCHashC(const char* input)
+{
+    unsigned int hash = 0;
+    int len = strlen(input);
+    unsigned int data = 0;
+    int width = (8 * sizeof(unsigned int));
+
+    for (int i = 0; i < len; i++)
+    {
+        data = input[i] ^ (hash >> (width - 8));
+        hash = crcTable[data] ^ (hash << 8);
+    }
+
+    printf("hash = %d", hash);
+
+    return hash;
+}

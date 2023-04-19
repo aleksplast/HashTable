@@ -17,16 +17,17 @@ int main()
     char statfile5[50] = "Rolstat.csv";
     char statfile6[50] = "Rorstat.csv";
     char statfile7[50] = "MurMurstat.csv";
+    char statfile8[50] = "CRCstat.csv";
 
     Text input = {};
     TextReader(filename, &input, "r");
     char** words = SplitTextIntoWords(input.ptr);
 
     HashTable table = {};
-    HashTableCtor(&table, *MurMurHash, 500);
+    HashTableCtor(&table, *HashReturnSumASCII, 1000);
 
     HashTableLoad(&table, words);
-    Statistics(&table, statfile5);
+    Statistics(&table, statfile3);
 
     HashTableDtor(&table);
     free(words);
