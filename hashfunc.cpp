@@ -119,7 +119,5 @@ unsigned int CRCHashC(const char* input)
         hash = crcTable[data] ^ (hash << 8);
     }
 
-    printf("hash = %d", hash);
-
     return hash;
 }

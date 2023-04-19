@@ -24,10 +24,10 @@ int main()
     char** words = SplitTextIntoWords(input.ptr);
 
     HashTable table = {};
-    HashTableCtor(&table, *HashReturnSumASCII, 1000);
+    HashTableCtor(&table, *RolHash, 1000);
 
     HashTableLoad(&table, words);
-    Statistics(&table, statfile3);
+    Statistics(&table, statfile5);
 
     HashTableDtor(&table);
     free(words);

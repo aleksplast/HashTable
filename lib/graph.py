@@ -5,7 +5,7 @@ import pandas as pd
 x = []
 y = []
 
-with open ("ASCIIsumstat.csv", "r") as f:
+with open ("Strlenstat.csv", "r") as f:
     for line in f:
         line = line.split(";")
         x = line
@@ -25,8 +25,8 @@ print(np.var(x))
 
 plt.bar(y,x)
 
-plt.title('Plot for ASCII sum hash')
-plt.xlabel('List')
+plt.title('Plot for Strlen Hash')
+plt.xlabel('Basket')
 plt.ylabel('Collisions')
 
 plt.show()

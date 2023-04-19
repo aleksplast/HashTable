@@ -9,7 +9,16 @@ In this project i had two main goals:
 
 Let's start by defining, what is hashtable actually.
 
-In this project hashtable is a table of linked lists and a hash functions attached to it. We will use text of immortal Hamlet by William Shakespeare for filling the hashtable. For each word we will first count hash of it, then put it to corresponding list.
+For this we will need some definitions:
+* **Key** - Any non-null object, in this project we will use strings as keys.
+* **Hash Function** - function, that calculates value by given key.
+* **Basket** - list in the hashtable.
+* **Capacity** - number of buskets in the hashtable.
+* **Collision** - case, where two different strings have the same key.
+* **Load factor** - average size of buskets in the hashtable.
+
+In this project **hashtable** is a table of linked lists and a hash functions attached to it. We will use text of Hamlet by William Shakespeare for filling the hashtable. For each word we will first count hash of it, then put it to corresponding basket.
+
 
 We will test 7 different hash functions in the first part and the best one we will optimize in the second part.
 
@@ -25,8 +34,8 @@ unsigned int HashReturn1(const char* input)
     return 1;
 }
 ~~~
-Here are the plot for this function:
-<img align="center"  src="https://github.com/aleksplast/HashTable/blob/main/lib/Return%201%20stat.png">
+Here are the plot for this function: (Dispersion = 603397.56)
+<img align="center"  src="./lib/Return 1 stat.png">
 
 This is the ugliest thing i've seen in my life.
 
@@ -37,8 +46,8 @@ unsigned int HashReturnFirstASCII(const char* input)
     return input[0];
 }
 ~~~
-Here are the plot:
-<img align="center"  src="https://github.com/aleksplast/HashTable/blob/main/lib/FirstASCII%20stat.png">
+Here are the plot: (Dispersion = 19734.64)
+<img align="center"  src="./lib/FirstASCII stat.png">
 
 This one looks not as ugly as a previous one, but it still is.
 ### Hash, that returns lenght of the word.
@@ -49,8 +58,8 @@ unsigned int HashReturnLen(const char* input)
 }
 ~~~
 
-Plot for this one:
-<img align="center"  src="https://github.com/aleksplast/HashTable/blob/main/lib/StrlenStat.png">
+Plot for this one: (Dispersion = 77765.57)
+<img align="center"  src="./lib/StrlenStat.png">
 
 Still not as good as we want.
 
@@ -69,9 +78,9 @@ unsigned int HashReturnSumASCII(const char* input)
 }
 ~~~
 
-And here comes the plot:
+And here comes the plot: (Dispersion = 90.73)
 
-<img align="center"  src="https://github.com/aleksplast/HashTable/blob/main/lib/ASCIIsum.png">
+<img align="center"  src="./lib/ASCIIsum.png">
 
 This one looks decent, but we can make better.
 
@@ -90,9 +99,9 @@ unsigned int RolHash(const char* input)
 }
 ~~~
 
-ROL plot:
+ROL plot: (Dispersion = 50.88)
 
-<img align="center"  src="https://github.com/aleksplast/HashTable/blob/main/lib/Rolstat.png">
+<img align="center"  src="./lib/Rolstat.png">
 
 We are getting better and better, let's now take a look at similar function
 
@@ -111,9 +120,38 @@ unsigned int RorHash(const char* input)
 }
 ~~~
 
-ROR plot:
+ROR plot: (Dispersion = 49.22)
 
-<img align="center"  src="https://github.com/aleksplast/HashTable/blob/main/lib/Rorstat.png">
+<img align="center"  src="./lib/Rorstat.png">
+
+This one is even better than the previous one.
+
+### CRC32 Hash
+
+Famous CRC32 hash goes like this:
+
+~~~C++
+unsigned int CRCHashC(const char* input)
+{
+    unsigned int hash = 0;
+    int len = strlen(input);
+    unsigned int data = 0;
+    int width = (8 * sizeof(unsigned int));
+
+    for (int i = 0; i < len; i++)
+    {
+        data = input[i] ^ (hash >> (width - 8));
+        hash = crcTable[data] ^ (hash << 8);
+    }
+
+    return hash;
+}
+~~~
+
+And here's the plot fot it: (Dispersion = 18.34)
+
+<img align="center"  src="./lib/CRCstat.png">
+
 
 ### MurMurHash
 
@@ -164,9 +202,9 @@ unsigned int MurMurHash(const char* data)
 }
 ~~~
 
-Plot for this one looking good:
+Plot for this one looking good: (Dispersion = 17.99)
 
-<img align="center"  src="https://github.com/aleksplast/HashTable/blob/main/lib/MurMurStat.png">
+<img align="center"  src="./lib/MurMurStat.png">
 
 This one is the best so far. Let's stop at this variant and try to optimize what we have.
 
@@ -174,5 +212,12 @@ This one is the best so far. Let's stop at this variant and try to optimize what
 
 ## Experiment explanation
 
+First of all, let's set out experiment conditions. As stated earlier, we will use text of Hamlet, written by William Shakespear to load the hashtable. Capacity of the hashtable will be 1000 baskets. Each word will be searched 10000 times. Using `callgrind` we will find hot spots of our programm. Programm will be compiled with `-O3` flag.
+
+## Initial parameters
+
+Before starting, let's take a look at a unoptimized programm.
+
+Callgrind layout for it looks like this:
 
 
