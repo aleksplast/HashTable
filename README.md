@@ -11,20 +11,21 @@ Let's start by defining, what is hashtable actually.
 
 For this we will need some definitions:
 * **Key** - Any non-null object, in this project we will use strings as keys.
-* **Hash Function** - function, that calculates value by given key.
+* **Hashvalue** - value for the corresponding key.
+* **Hash Function** - function, that calculates hashvalue by given key.
 * **Basket** - list in the hashtable.
 * **Capacity** - number of buskets in the hashtable.
-* **Collision** - case, where two different strings have the same key.
+* **Collision** - case, where two different keys have the same hashvalue.
 * **Load factor** - average size of buskets in the hashtable.
 
-In this project **hashtable** is a table of linked lists and a hash functions attached to it. We will use text of Hamlet by William Shakespeare for filling the hashtable. For each word we will first count hash of it, then put it to corresponding basket.
+In this project **hashtable** is a table of linked lists and a hash functions attached to it. We will use text of Hamlet by William Shakespeare for filling the hashtable. For each word we will first count hashvalue of it, then put it to corresponding basket.
 
 
 We will test 7 different hash functions in the first part and the best one we will optimize in the second part.
 
 # Chapter I: different hash functions
 
-Let's take a take a look at different hash functions, for each one we will look at the amount of collisions in each list.
+Let's take a take a look at different hash functions, for each one we will look at the amount of collisions in each basket.
 
 ### Hash, that always returns 1
 
@@ -216,8 +217,141 @@ First of all, let's set out experiment conditions. As stated earlier, we will us
 
 ## Initial parameters
 
-Before starting, let's take a look at a unoptimized programm.
+Before starting, let's take a look at a unoptimized programm (Remainder: programm compiled with `-O3` flag).
 
 Callgrind layout for it looks like this:
 
+**ВСТАВИТЬ НАКОНЕЦ КАРТИНКИ**
+
+Let's put out base variant into the table.
+
+| Optimization | Number of machine commands | Absolute speed growth | Relative speed growth |
+| :----------: | :-------------------: | :------------------:       | :---------------------:     |
+| No optimization |   16 740 227 454           |   1                | 1                   |
+
+## Optimization 1
+
+As we can see from callgrind layout for our base version, most hot spot is strcmp function. Let's try to optimize it by doing an inline assembly of our strcmp.
+
+Code for it goes like this:
+
+~~~C++
+int inline strcmp_asm (const char* str1, const char* str2)
+{
+    int result = 0;
+    asm(".intel_syntax noprefix\n\t"
+        "mov rsi, %1\n\t"
+        "mov rdi, %2\n\t"
+        "Next:\n"
+            "mov r11b, byte ptr [rsi]\n"
+            "mov r10b, byte ptr [rdi]\n"
+    	    "cmp r10b, 0\n"
+    	    "je done\n"
+    	    "cmp r11b, 0\n"
+    	    "je done\n"
+    	    "cmp r11b, r10b\n"
+    	    "jne done\n"
+    	    "inc rdi\n"
+    	    "inc rsi\n"
+    	    "jmp Next\n"
+        "done:\n"
+            "movzx rax, r10b\n"
+            "movzx rbx, r11b\n"
+    	    "sub rax, rbx\n"
+        ".att_syntax"
+        : "=r" (result) : "r" (str1), "r" (str2) : "rax", "rbx", "rsi", "rdi", "r10", "r11"
+    );
+    return result;
+}
+~~~
+
+Let's look at a callgrind layout for this optimization.
+
+**ВСТАВИТЬ НАКОНЕЦ КАРТИНКИ**
+
+| Optimization | Number of machine commands | Absolute speed growth | Relative speed growth |
+| :----------: | :-------------------: | :------------------:       | :---------------------:     |
+| No optimization |   16 740 227 454           |   1                | 1                   |
+| Optimization1 |   32 089 240 018           |   0.52                | 0.52                   |
+
+We can notice significant drawback at programm speed, because of it we will not use this optimization later.
+
+## Optimization 2
+
+Second hot spot in base variant was a MurMurHash function. Let's rewrite it on assembler. 
+
+Code goes like this:
+
+~~~Assembly
+MurMurHashAsm:
+        push rbx
+
+        mov ebx, esi            ; seed ^ lenght
+        xor eax, eax
+
+.Next:  imul eax, dword [rdi], BASE     ; curr *= base
+        mov ecx, eax
+        shr ecx, 24             ; curr >> shift
+
+        xor eax, ecx            ; curr ^= curr >> shift
+
+        imul ebx, ebx, BASE     ; hash *= base
+        xor ebx, eax            ; hash ^= curr
+        add rdi, 4              ; buffer += 4
+        sub rsi, 4              ; lenght -= 4
+
+        cmp rsi, 4              ; while (lenght >= 4)
+        jge .Next
+
+        mov eax, ebx            ; hash in rax
+        xor ebx, ebx
+
+        cmp rsi, 3
+        je .Three
+        cmp  rsi, 2
+        je .Two
+
+        jmp .Done
+
+.Three: movzx ebx, byte [rdi + 2]  ; buffer[2]
+        sal ebx, 16             ; buffer[2] << 16
+        xor eax, ebx            ; hash ^= buffer[2] << 16
+        xor ebx, ebx
+
+
+.Two:   movzx ebx, byte [rdi + 1]  ; buffer[1]
+        sal ebx, 8              ; buffer[1] << 8
+        xor eax, ebx            ; hash ^= buffer[1] << 8
+        xor ebx, ebx
+
+.Done:  movzx ebx, byte [rdi]      ; buffer[0]
+        xor ebx, ebx            ; hash ^= buffer[0]
+        imul eax, eax, BASE     ; hash *= r12
+
+        mov ebx, eax            ; hash in rbx
+        shr ebx, 13             ; hash >> 13
+        xor eax, ebx            ; hash ^= hash >> 13
+
+        imul eax, eax, BASE     ; hash *= base
+        mov ebx, eax            ; hash in rbx
+        shr ebx, 15             ; hash >> 15
+        xor eax, ebx            ; hash ^= hash >> 15
+
+        pop rbx
+        ret
+
+.data
+
+BASE equ 0x5bd1e995
+~~~
+
+| Optimization | Number of machine commands | Absolute speed growth | Relative speed growth |
+| :----------: | :-------------------: | :------------------:       | :---------------------:     |
+| No optimization |   16 740 227 454           |   1                | 1                   |
+| Optimization1 |   32 089 240 018           |   0.52                | 0.52                   |
+| Optimization2 |   16 260 100 266           |   1.03                | 1.97                   |
+
+Finally, we were able te get some speed growth. This optimization remains in place.
+
+## Optimization 3
 
