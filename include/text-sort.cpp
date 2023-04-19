@@ -19,7 +19,7 @@ int TextReader (const char* file, struct poem* text, const char* mode)
     }
 
     (*text).size = FileSize(fp);
-    (*text).ptr = (char*) calloc((*text).size, sizeof(char));
+    (*text).ptr = (char*) calloc((*text).size + 1, sizeof(char));
 
     assert((*text).ptr != NULL);
 

@@ -205,6 +205,9 @@ int ListDetor(struct List* list)
         DeleteElement(list, TAIL);
     }
 
+    if (HEAD != list->fictelem)
+        free(HEAD);
+
     free(list->fictelem);
     list->size = -1;
 

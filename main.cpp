@@ -23,13 +23,15 @@ int main()
     char** words = SplitTextIntoWords(input.ptr);
 
     HashTable table = {};
-    HashTableCtor(&table, *RolHash, 1000);
+    HashTableCtor(&table, *MurMurHash, 500);
 
     HashTableLoad(&table, words);
     Statistics(&table, statfile5);
 
     HashTableDtor(&table);
     free(words);
+    free(input.ptr);
+    free(input.Strings);
     printf("DONE\n");
     return 0;
 }

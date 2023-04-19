@@ -30,6 +30,7 @@ int HashTableDtor(HashTable* hashtable)
     for (int i = 0; i < hashtable->size; i++)
     {
         ListDetor(hashtable->table[i]);
+        free(hashtable->table[i]);
     }
 
     hashtable->size = -1;
