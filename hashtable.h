@@ -63,6 +63,8 @@ unsigned int RorFunc(int input, int shift);
 
 unsigned int MurMur(__m128i input);
 
+unsigned int CRCHash(__m128i input);
+
 extern "C" inline unsigned int MurMurHashAsm (char* input, int len);
 
 int strcmp_asm (const char* str1, const char* str2);

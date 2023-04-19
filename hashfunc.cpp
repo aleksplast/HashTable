@@ -115,3 +115,16 @@ unsigned int MurMur(__m128i input)
 
     return hash;
 }
+
+unsigned int CRCHash(__m128i input)
+{
+    unsigned int hash = 0;
+    unsigned char* str = (unsigned char*)(&input);
+
+    for (int i = 0; i < 16; i++)
+    {
+        hash = _mm_crc32_u32(hash, str[i]);
+    }
+
+    return hash;
+}
