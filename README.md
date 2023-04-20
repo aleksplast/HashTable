@@ -18,10 +18,12 @@ For this we will need some extra definitions:
 * **Collision** - case, where two different keys have the same hashvalue.
 * **Load factor** - average size of baskets in the hashtable.
 
-In this project **hashtable** is a table of linked lists and a hash functions attached to it. We will use text of Hamlet by William Shakespeare for filling the hashtable. For each word we will first count hashvalue of it, then put it to corresponding basket.
+In this project **hashtable** is a table of linked lists and a hash functions attached to it. This method of constructing hashtable is called **chainging method**.
+
+We will use text of Hamlet by William Shakespeare for filling the hashtable. For each word we will first count hashvalue of it, then put it to corresponding basket.
 
 
-We will test 7 different hash functions in the first part and the best one we will optimize in the second part.
+We will test 8 different hash functions in the first part and the best one we will optimize in the second part.
 
 # Chapter I: different hash functions
 
@@ -233,7 +235,7 @@ Let's put base variant into the table.
 | :----------: | :-------------------: | :------------------:       | :---------------------:     |
 | No optimization |   16 740 227 454           |   1                | 1                   |
 
-## Optimization 1
+## Optimization 1. Inline assembly of strcmp.
 
 As we can see from callgrind layout for our base version, most hot spot is strcmp function. Let's try to optimize it by doing an inline assembly of our strcmp.
 
@@ -278,11 +280,11 @@ int inline strcmp_asm (const char* str1, const char* str2)
 | Optimization | Number of machine commands | Absolute speed growth | Relative speed growth |
 | :----------: | :-------------------: | :------------------:       | :---------------------:     |
 | No optimization |   16 740 227 454           |   1                | 1                   |
-| Optimization1 |   32 089 240 018           |   0.52                | 0.52                   |
+| Optimization1 |   32 089 240 018           |   0.59                | 0.59                   |
 
 We can notice significant drawback at programm speed, because of it we will not use this optimization later.
 
-## Optimization 2
+## Optimization 2. Hash function in assembler.
 
 Second hot spot in base variant was a MurMurHash function. Let's rewrite it on assembler. 
 
@@ -322,16 +324,14 @@ MurMurHashAsm:
 .Three: movzx ebx, byte [rdi + 2]  ; buffer[2]
         sal ebx, 16             ; buffer[2] << 16
         xor eax, ebx            ; hash ^= buffer[2] << 16
-        xor ebx, ebx
 
 
 .Two:   movzx ebx, byte [rdi + 1]  ; buffer[1]
         sal ebx, 8              ; buffer[1] << 8
         xor eax, ebx            ; hash ^= buffer[1] << 8
-        xor ebx, ebx
 
 .Done:  movzx ebx, byte [rdi]      ; buffer[0]
-        xor ebx, ebx            ; hash ^= buffer[0]
+        xor eax, ebx            ; hash ^= buffer[0]
         imul eax, eax, BASE     ; hash *= r12
 
         mov ebx, eax            ; hash in rbx
@@ -357,13 +357,132 @@ BASE equ 0x5bd1e995
 <img align="center" src = "https://user-images.githubusercontent.com/111467660/233326565-2b4820fa-401f-41a4-8689-d0d4ef84fffb.png">
 </details>
 
+Also, let's calculate assembler efficiency coefficient. Check out this [work](https://github.com/TNVC/HashTable), it was first mentioned here.
+
+Coefficient calculated as stated: $D = \frac{A}{L} \cdot 1000 $, where A is an acceleration and L is a number of lines in assembler.
+
+In our case: D = 16.2
+
 | Optimization | Number of machine commands | Absolute speed growth | Relative speed growth |
 | :----------: | :-------------------: | :------------------:       | :---------------------:     |
 | No optimization |   16 740 227 454           |   1                | 1                   |
 | Optimization1 |   32 089 240 018           |   0.52                | 0.52                   |
-| Optimization2 |   16 260 100 266           |   1.03                | 1.97                   |
+| Optimization2 |   16 260 100 266           |   1.05                | 1.76                   |
 
 Finally, we were able te get some speed growth. This optimization remains in place.
 
-## Optimization 3
+## Optimization 3. Implementing SIMD instructions.
 
+In this optimization we will use SIMD instructions, you can read about them [here](https://github.com/aleksplast/SIMD)
+
+Let's take a closer look at given text. Maximal word lenght in it is 13 symbols. Let's edit given file, adding each word up to 16 symbols. Now we can change our key format to __m128i. With it we can change strcmp function to intrinsic analogue.
+
+New function looks like this:
+
+~~~C++
+SearchStatus FindByHash(HashTable* hashtable, __m128i input)
+{
+    unsigned int hash = hashtable->function(input) % hashtable->size;
+
+    Node* curelem = hashtable->table[hash]->fictelem->prev;
+    Node* fictelement = hashtable->table[hash]->fictelem;
+
+    while (curelem != fictelement)
+    {
+       if (_mm_testnzc_si128(curelem->val, input) == 0)
+           return SEARCH_SUCCESS;
+        curelem = curelem->prev;
+    }
+
+    return SEARCH_FAILURE;
+}
+~~~
+
+<details>
+<summary> Callgrind layout for optimization 3 </summary>
+<img align="center" src = "https://user-images.githubusercontent.com/111467660/233380329-b0ac6363-b658-40c1-85e0-0e3eef4575a8.png">
+</details>
+
+| Optimization | Number of machine commands | Absolute speed growth | Relative speed growth |
+| :----------: | :-------------------: | :------------------:       | :---------------------:     |
+| No optimization |   16 740 227 454           |   1                | 1                   |
+| Optimization1 |   32 089 240 018           |   0.52                | 0.52                   |
+| Optimization2 |   16 260 100 266           |   1.05                | 1.76                   |
+| Optimization3 |   9 441 826 101           |   1.74                | 1.67                   |
+
+## Optimization 4. Changing hash function.
+
+In this part, we will try to change our hash function. Let's consider CRC function as an opponent to MurMurHash. CRC is faster, but has roughly the same load factor. Also, it has an in-built instrinsic function for faster calculation. We are lucky, because in previous step we changed all keys to __m128i format.
+
+Now, our hash function looks like this:
+
+~~~C++
+unsigned int CRCHash(__m128i input)
+{
+    unsigned int hash = 0;
+    unsigned char* str = (unsigned char*)(&input);
+
+    for (int i = 0; i < 16; i++)
+    {
+        hash = _mm_crc32_u32(hash, str[i]);
+    }
+
+    return hash;
+}
+~~~
+
+<details>
+<summary> Callgrind layout for optimization 4 </summary>
+<img align="center" src = "https://user-images.githubusercontent.com/111467660/233384477-5795e4bc-9ce6-4658-8883-761dd4e29cdf.png">
+</details>
+
+| Optimization | Number of machine commands | Absolute speed growth | Relative speed growth |
+| :----------: | :-------------------: | :------------------:       | :---------------------:     |
+| No optimization |   16 740 227 454           |   1                | 1                   |
+| Optimization1 |   32 089 240 018           |   0.59                | 0.59                   |
+| Optimization2 |   16 260 100 266           |   1.05                | 1.76                   |
+| Optimization3 |   9 441 826 101           |   1.74                | 1.67                   |
+| Optimization4 |   6 711 633 355           |   1.80                | 1.03                   |
+
+## Optimization 5. Reducing load factor.
+
+In this part we will reduce load factor. It is the most obvious way to optimize hash function. Maybe you were asking yourself: "Why didn't we do it in the first place?". 
+Of course, we will increase our programm speed, but this comes at cost too. We will need more memory for this hashtable. Also, with low load factor we will find words almost instantly, thus there will be nothing left to optimize. This optimization is the last one in educational purposes. 
+
+Let's change capacity of our hashtable to 8000, load factor will be around **XXX**.
+
+<details>
+<summary> Callgrind layout for optimization 5 </summary>
+<img align="center" src = "https://user-images.githubusercontent.com/111467660/233389526-f59a559d-bb84-4870-90cd-982a66ae4218.png">
+</details>
+
+| Optimization | Number of machine commands | Absolute speed growth | Relative speed growth |
+| :----------: | :-------------------: | :------------------:       | :---------------------:     |
+| No optimization |   16 740 227 454           |   1                | 1                   |
+| Optimization1 |   32 089 240 018           |   0.59                | 0.59                   |
+| Optimization2 |   16 260 100 266           |   1.05                | 1.76                   |
+| Optimization3 |   9 441 826 101           |   1.05                | 1.67                   |
+| Optimization4 |   6 711 633 355           |   1.80                | 1.03                   |
+| Optimization5 |   5 504 922 705           |   4.59                | 2.55                   |
+
+# Conclusion
+
+* In this project we learned, what is hashtable, how to construct it
+* We tested 7 different hash functions and choose the best one
+* Using assembler, SIMD instructions and other methods we were able to make search in hashtable 4.59 times faster than compiler could. 
+
+Here is final table with all optimizations.
+
+| Optimization | Number of machine commands | Absolute speed growth | Relative speed growth |
+| :----------: | :-------------------: | :------------------:       | :---------------------:     |
+| No optimization |   16 740 227 454           |   1                | 1                   |
+| Optimization1 |   32 089 240 018           |   0.59                | 0.59                   |
+| Optimization2 |   16 260 100 266           |   1.05                | 1.76                   |
+| Optimization3 |   9 441 826 101           |   1.05                | 1.67                   |
+| Optimization4 |   6 711 633 355           |   1.80                | 1.03                   |
+| Optimization5 |   5 504 922 705           |   4.59                | 2.55                   |
+
+References:
+
+1. https://github.com/aleksplast/SIMD
+2. https://github.com/TNVC/HashTable
