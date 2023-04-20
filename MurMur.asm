@@ -38,16 +38,14 @@ MurMurHashAsm:
 .Three: movzx ebx, byte [rdi + 2]  ; buffer[2]
         sal ebx, 16             ; buffer[2] << 16
         xor eax, ebx            ; hash ^= buffer[2] << 16
-        xor ebx, ebx
 
 
 .Two:   movzx ebx, byte [rdi + 1]  ; buffer[1]
         sal ebx, 8              ; buffer[1] << 8
         xor eax, ebx            ; hash ^= buffer[1] << 8
-        xor ebx, ebx
 
 .Done:  movzx ebx, byte [rdi]      ; buffer[0]
-        xor ebx, ebx            ; hash ^= buffer[0]
+        xor eax, ebx            ; hash ^= buffer[0]
         imul eax, eax, BASE     ; hash *= r12
 
         mov ebx, eax            ; hash in rbx

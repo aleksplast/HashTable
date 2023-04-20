@@ -108,7 +108,7 @@ int Statistics(HashTable* hashtable, char* filename)
 
 int StressTable(Words* array, HashTable* table)
 {
-    for (int i = 0; i < 10000; i++)
+    for (int i = 0; i < 9500; i++)
     {
         for (int j = 0; j < array->num; j++)
         {
