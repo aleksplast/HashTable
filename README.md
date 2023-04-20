@@ -37,7 +37,7 @@ unsigned int HashReturn1(const char* input)
     return 1;
 }
 ~~~
-Here are the plot for this function: (Dispersion = 603397.56)
+Here are the plot for this function: (Dispersion = 603397.56, Load factor = 7807)
 
 <img align="center"  src="./lib/Return 1 stat.png">
 
@@ -50,7 +50,7 @@ unsigned int HashReturnFirstASCII(const char* input)
     return input[0];
 }
 ~~~
-Here are the plot: (Dispersion = 19734.64)
+Here are the plot: (Dispersion = 19734.64, Load factor = 159)
 
 <img align="center"  src="./lib/FirstASCII stat.png">
 
@@ -63,7 +63,7 @@ unsigned int HashReturnLen(const char* input)
 }
 ~~~
 
-Plot for this one: (Dispersion = 77765.57)
+Plot for this one: (Dispersion = 77765.57, Load factor = 411)
 
 <img align="center"  src="./lib/StrlenStat.png">
 
@@ -84,7 +84,7 @@ unsigned int HashReturnSumASCII(const char* input)
 }
 ~~~
 
-And here comes the plot: (Dispersion = 90.73)
+And here comes the plot: (Dispersion = 90.73, Load factor = 9.51)
 
 <img align="center"  src="./lib/ASCIIsum.png">
 
@@ -105,7 +105,7 @@ unsigned int RolHash(const char* input)
 }
 ~~~
 
-ROL plot: (Dispersion = 50.88)
+ROL plot: (Dispersion = 50.88, Load factor = 8.28)
 
 <img align="center"  src="./lib/Rolstat.png">
 
@@ -126,7 +126,7 @@ unsigned int RorHash(const char* input)
 }
 ~~~
 
-ROR plot: (Dispersion = 49.22)
+ROR plot: (Dispersion = 49.22, Load factor = 8.22)
 
 <img align="center"  src="./lib/Rorstat.png">
 
@@ -154,7 +154,7 @@ unsigned int CRCHashC(const char* input)
 }
 ~~~
 
-And here's the plot fot it: (Dispersion = 18.34)
+And here's the plot fot it: (Dispersion = 18.34, Load factor = 7.81)
 
 <img align="center"  src="./lib/CRCstat.png">
 
@@ -208,7 +208,7 @@ unsigned int MurMurHash(const char* data)
 }
 ~~~
 
-Plot for this one looking good: (Dispersion = 17.99)
+Plot for this one looking good: (Dispersion = 17.99, Load factor = 7.76)
 
 <img align="center"  src="./lib/MurMurStat.png">
 
@@ -449,7 +449,7 @@ unsigned int CRCHash(__m128i input)
 In this part we will reduce load factor. It is the most obvious way to optimize hash function. Maybe you were asking yourself: "Why didn't we do it in the first place?". 
 Of course, we will increase our programm speed, but this comes at cost too. We will need more memory for this hashtable. Also, with low load factor we will find words almost instantly, thus there will be nothing left to optimize. This optimization is the last one in educational purposes. 
 
-Let's change capacity of our hashtable to 8000, load factor will be around **XXX**.
+Let's change capacity of our hashtable to 8000, load factor will be around 2.
 
 <details>
 <summary> Callgrind layout for optimization 5 </summary>
@@ -468,8 +468,8 @@ Let's change capacity of our hashtable to 8000, load factor will be around **XXX
 # Conclusion
 
 * In this project we learned, what is hashtable, how to construct it
-* We tested 7 different hash functions and choose the best one
-* Using assembler, SIMD instructions and other methods we were able to make search in hashtable 4.59 times faster than compiler could. 
+* We tested 8 different hash functions and chose the best one
+* Using assembler, SIMD instructions and other methods we were able to make search in hashtable 4.59 times faster than compiler could
 
 Here is final table with all optimizations.
 
