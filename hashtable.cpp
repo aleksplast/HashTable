@@ -55,21 +55,16 @@ int HashTableAdd(HashTable* hashtable, __m128i input)
 SearchStatus FindByHash(HashTable* hashtable, __m128i input)
 {
     DBG assert(hashtable != NULL);
-//    printf("input = %s\n", input);
 
     int hash = hashtable->function(input) % hashtable->size;
 
     Node* curelem = hashtable->table[hash]->fictelem->prev;
     Node* fictelement = hashtable->table[hash]->fictelem;
-//    printf("curelem = %p, fictelem = %p, input = %p\n", curelem, fictelement, input);
 
     while (curelem != fictelement)
     {
        if (_mm_testnzc_si128(curelem->val, input) == 0)
-       {
-//           printf("To find = %s, found = %s\n", input, curelem->val);
            return SEARCH_SUCCESS;
-       }
         curelem = curelem->prev;
     }
 
