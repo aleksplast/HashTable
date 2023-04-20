@@ -3,20 +3,20 @@
 
 In this project i had two main goals:
 1. Creating hashtable for fast word finding.
-2. Optimizing algorithm using assembler, SIMD instructions and other methods.
+2. Optimizing searching algorithm using assembler, SIMD instructions and other methods.
 
 ## What is hashtable
 
 Let's start by defining, what is hashtable actually.
 
-For this we will need some definitions:
+For this we will need some extra definitions:
 * **Key** - Any non-null object, in this project we will use strings as keys.
 * **Hashvalue** - value for the corresponding key.
 * **Hash Function** - function, that calculates hashvalue by given key.
 * **Basket** - list in the hashtable.
-* **Capacity** - number of buskets in the hashtable.
+* **Capacity** - number of baskets in the hashtable.
 * **Collision** - case, where two different keys have the same hashvalue.
-* **Load factor** - average size of buskets in the hashtable.
+* **Load factor** - average size of baskets in the hashtable.
 
 In this project **hashtable** is a table of linked lists and a hash functions attached to it. We will use text of Hamlet by William Shakespeare for filling the hashtable. For each word we will first count hashvalue of it, then put it to corresponding basket.
 
@@ -36,6 +36,7 @@ unsigned int HashReturn1(const char* input)
 }
 ~~~
 Here are the plot for this function: (Dispersion = 603397.56)
+
 <img align="center"  src="./lib/Return 1 stat.png">
 
 This is the ugliest thing i've seen in my life.
@@ -48,6 +49,7 @@ unsigned int HashReturnFirstASCII(const char* input)
 }
 ~~~
 Here are the plot: (Dispersion = 19734.64)
+
 <img align="center"  src="./lib/FirstASCII stat.png">
 
 This one looks not as ugly as a previous one, but it still is.
@@ -60,6 +62,7 @@ unsigned int HashReturnLen(const char* input)
 ~~~
 
 Plot for this one: (Dispersion = 77765.57)
+
 <img align="center"  src="./lib/StrlenStat.png">
 
 Still not as good as we want.
@@ -215,15 +218,16 @@ This one is the best so far. Let's stop at this variant and try to optimize what
 
 First of all, let's set out experiment conditions. As stated earlier, we will use text of Hamlet, written by William Shakespear to load the hashtable. Capacity of the hashtable will be 1000 baskets. Each word will be searched 10000 times. Using `callgrind` we will find hot spots of our programm. Programm will be compiled with `-O3` flag.
 
-## Initial parameters
+## Base version
 
-Before starting, let's take a look at a unoptimized programm (Remainder: programm compiled with `-O3` flag).
+Before starting, let's take a look at a base variant of our programm.
 
-Callgrind layout for it looks like this:
+<details>
+<summary> Callgrind layout for base version </summary>
+<img alilgn = "center" src = "https://user-images.githubusercontent.com/111467660/233328188-d00ee97e-9390-4815-ad5d-2161c0f941a6.png">
+</details>
 
-**ВСТАВИТЬ НАКОНЕЦ КАРТИНКИ**
-
-Let's put out base variant into the table.
+Let's put base variant into the table.
 
 | Optimization | Number of machine commands | Absolute speed growth | Relative speed growth |
 | :----------: | :-------------------: | :------------------:       | :---------------------:     |
@@ -265,9 +269,11 @@ int inline strcmp_asm (const char* str1, const char* str2)
 }
 ~~~
 
-Let's look at a callgrind layout for this optimization.
 
-**ВСТАВИТЬ НАКОНЕЦ КАРТИНКИ**
+<details>
+<summary> Callgrind layout for optimization 1 </summary>
+<img align = "center" src= "https://user-images.githubusercontent.com/111467660/233327686-d4647e95-3b05-419f-8bff-89d387caed5f.png">
+</details>
 
 | Optimization | Number of machine commands | Absolute speed growth | Relative speed growth |
 | :----------: | :-------------------: | :------------------:       | :---------------------:     |
@@ -344,6 +350,12 @@ MurMurHashAsm:
 
 BASE equ 0x5bd1e995
 ~~~
+
+
+<details>
+<summary> Callgrind layout for optimization 2 </summary>
+<img align="center" src = "https://user-images.githubusercontent.com/111467660/233326565-2b4820fa-401f-41a4-8689-d0d4ef84fffb.png">
+</details>
 
 | Optimization | Number of machine commands | Absolute speed growth | Relative speed growth |
 | :----------: | :-------------------: | :------------------:       | :---------------------:     |
