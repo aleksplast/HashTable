@@ -67,7 +67,7 @@ SearchStatus FindByHash(HashTable* hashtable, const char* input)
 
     while (curelem != fictelement)
     {
-        if (strcmp(curelem->val, input) == 0)
+        if (strcmp_asm(curelem->val, input) == 0)
         {
 //            printf("To find = %s, found = %s\n", input, curelem->val);
             return SEARCH_SUCCESS;

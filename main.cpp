@@ -28,7 +28,7 @@ int main()
     SplitTextIntoWords(&text, &input);
 
     HashTable table = {};
-    HashTableCtor(&table, *MurMur, 1000);
+    HashTableCtor(&table, *MurMurHash, 1000);
 
     HashTableLoad(&table, &text);
     Statistics(&table, statfile8);
