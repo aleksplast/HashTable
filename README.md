@@ -20,6 +20,10 @@ For this we will need some extra definitions:
 
 In this project **hashtable** is a table of linked lists and a hash functions attached to it. This method of constructing hashtable is called **chainging method**.
 
+Here's the example of hashtable, where hashfunction is a first letter of a word and keys are these words: "Emperor", "Horus", "Heresy", "Korvus". You can notice that the list with the letter A is empty, because no words, starting with the same letter was given. Same happens to all other letters, excluding E, H, K.
+<img align = "center" src = "https://user-images.githubusercontent.com/111467660/233713336-2b2c9d21-c7b1-4783-9e83-4e659dfb0491.png">
+
+
 We will use text of Hamlet by William Shakespeare for filling the hashtable. For each word we will first count hashvalue of it, then put it to corresponding basket.
 
 
@@ -37,9 +41,11 @@ unsigned int HashReturn1(const char* input)
     return 1;
 }
 ~~~
-Here are the plot for this function: (Dispersion = 603397.56, Load factor = 7807)
+Here are the plot for this function:
 
 <img align="center"  src="./lib/Return 1 stat.png">
+
+>Dispersion = 603397.56, Load factor = 7807
 
 This is the ugliest thing i've seen in my life.
 
@@ -50,9 +56,11 @@ unsigned int HashReturnFirstASCII(const char* input)
     return input[0];
 }
 ~~~
-Here are the plot: (Dispersion = 19734.64, Load factor = 159)
+Here are the plot:
 
 <img align="center"  src="./lib/FirstASCII stat.png">
+
+>Dispersion = 19734.64, Load factor = 159
 
 This one looks not as ugly as a previous one, but it still is.
 ### Hash, that returns lenght of the word.
@@ -63,9 +71,11 @@ unsigned int HashReturnLen(const char* input)
 }
 ~~~
 
-Plot for this one: (Dispersion = 77765.57, Load factor = 411)
+Plot for this one:
 
 <img align="center"  src="./lib/StrlenStat.png">
+
+>Dispersion = 77765.57, Load factor = 411
 
 Still not as good as we want.
 
@@ -84,9 +94,11 @@ unsigned int HashReturnSumASCII(const char* input)
 }
 ~~~
 
-And here comes the plot: (Dispersion = 90.73, Load factor = 9.51)
+And here comes the plot:
 
 <img align="center"  src="./lib/ASCIIsum.png">
+
+>Dispersion = 90.73, Load factor = 9.51
 
 This one looks decent, but we can make better.
 
@@ -105,9 +117,11 @@ unsigned int RolHash(const char* input)
 }
 ~~~
 
-ROL plot: (Dispersion = 50.88, Load factor = 8.28)
+ROL plot:
 
 <img align="center"  src="https://user-images.githubusercontent.com/111467660/233705181-5e8434e5-8122-4be2-b350-f75b2f92723d.png">
+
+>Dispersion = 50.88, Load factor = 8.28
 
 We are getting better and better, let's now take a look at similar function
 
@@ -126,9 +140,11 @@ unsigned int RorHash(const char* input)
 }
 ~~~
 
-ROR plot: (Dispersion = 205.93, Load factor = 21.15)
+ROR plot:
 
 <img align="center"  src="https://user-images.githubusercontent.com/111467660/233705256-ea7f50c1-0213-42bc-9c76-e473f7995c6f.png">
+
+>Dispersion = 205.93, Load factor = 21.15
 
 This is the downgrade from the previous one.
 
@@ -154,9 +170,11 @@ unsigned int CRCHashC(const char* input)
 }
 ~~~
 
-And here's the plot fot it: (Dispersion = 18.34, Load factor = 7.81)
+And here's the plot fot it:
 
 <img align="center"  src="./lib/CRCstat.png">
+
+>Dispersion = 18.34, Load factor = 7.81
 
 
 ### MurMurHash
@@ -208,11 +226,31 @@ unsigned int MurMurHash(const char* data)
 }
 ~~~
 
-Plot for this one looking good: (Dispersion = 17.99, Load factor = 7.76)
+Plot for this one looking good:
 
 <img align="center"  src="./lib/MurMurStat.png">
 
-This one is the best so far. Let's stop at this variant and try to optimize what we have.
+>Dispersion = 17.99, Load factor = 7.81
+
+## Analysis
+
+In this part we will choose best function from previous ones. Obviously, ones to choose from is this ones: MurMurHash, CRC hash, Rotate left hash, ASCII sum hash. 
+Let's put them all on one plot:
+
+<img align = "center" src = "https://user-images.githubusercontent.com/111467660/233719610-1ccf95c7-c7b4-4933-92ed-dc3e965c0436.png">
+
+>Blue - Rotate left hash, Red - ASCII sum hash, Brown - MurMurHash, Green - CRC hash
+
+Let's also compare dispersion and load factor of each function. Here is table for this:
+
+| Hashfunction | Dispersion | Load factor |
+| :----------: | :-------------------: | :------------------:       | 
+| ASCII sum hash |  90.73            |       9.51           | 
+| ROL hash |     50.88         |        8.28           | 
+| CRC hash |     18.34         |        7.81           | 
+| MurMur hash |    17.99          |      7.81             | 
+
+From this data we can conclude: MurMurHash is the best. Let's choose it as a hashfunction for later use and move to chapter II.
 
 # Chapter II: Optimizations
 
@@ -286,7 +324,16 @@ We can notice significant drawback at programm speed, because of it we will not 
 
 <details>
 <summary> Additional research for this optimization </summary>
-During my research, i was also doing some test with `-O1` optimization flag.
+During my research, i was also doing some test with -O1 optimization flag.
+
+In this variant, comparing to `-O3` variant i was able to get some speed up.
+
+| Optimization | Speed growth  |
+| :----------: | :-------------------: |
+| No optimization (`-O1`) |    1           |
+| Optimization1 |  1.1                   |
+
+This shows, how different compilation flags can affect your programm.
 </details>
 
 ## Optimization 2. Hash function in assembler.
@@ -487,7 +534,7 @@ Here is final table with all optimizations.
 | Optimization4 |   6 711 633 355           |   1.80                | 1.03                   |
 | Optimization5 |   5 504 922 705           |   4.59                | 2.55                   |
 
-References:
+# References:
 
 1. https://github.com/aleksplast/SIMD
 2. https://github.com/TNVC/HashTable
