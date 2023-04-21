@@ -107,7 +107,7 @@ unsigned int RolHash(const char* input)
 
 ROL plot: (Dispersion = 50.88, Load factor = 8.28)
 
-<img align="center"  src="./lib/Rolstat.png">
+<img align="center"  src="https://user-images.githubusercontent.com/111467660/233705181-5e8434e5-8122-4be2-b350-f75b2f92723d.png">
 
 We are getting better and better, let's now take a look at similar function
 
@@ -126,11 +126,11 @@ unsigned int RorHash(const char* input)
 }
 ~~~
 
-ROR plot: (Dispersion = 49.22, Load factor = 8.22)
+ROR plot: (Dispersion = 205.93, Load factor = 21.15)
 
-<img align="center"  src="./lib/Rorstat.png">
+<img align="center"  src="https://user-images.githubusercontent.com/111467660/233705256-ea7f50c1-0213-42bc-9c76-e473f7995c6f.png">
 
-This one is even better than the previous one.
+This is the downgrade from the previous one.
 
 ### CRC32 Hash
 
@@ -283,6 +283,11 @@ int inline strcmp_asm (const char* str1, const char* str2)
 | Optimization1 |   32 089 240 018           |   0.59                | 0.59                   |
 
 We can notice significant drawback at programm speed, because of it we will not use this optimization later.
+
+<details>
+<summary> Additional research for this optimization </summary>
+During my research, i was also doing some test with `-O1` optimization flag.
+</details>
 
 ## Optimization 2. Hash function in assembler.
 
