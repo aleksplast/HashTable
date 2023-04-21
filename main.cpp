@@ -22,7 +22,7 @@ int main()
     char statfile6[50] = "Rorstat.csv";
     char statfile7[50] = "MurMurstat.csv";
     char statfile8[50] = "MurMurAsm.csv";
-    char statfile9[50] = "MurMurAsm.csv";
+    char statfile9[50] = "CRCstat.csv";
 
     Text input = {};
     Words text = {};
@@ -30,10 +30,10 @@ int main()
     SplitTextIntoWords(&text, &input);
 //
      HashTable table = {};
-     HashTableCtor(&table, *CRCHash, 1000);
+     HashTableCtor(&table, *CRCHash, 8000);
 //
      HashTableLoad(&table, &text);
-     Statistics(&table, statfile8);
+     Statistics(&table, statfile9);
 //
     clock_t start = clock();
     StressTable(&text, &table);

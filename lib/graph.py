@@ -5,7 +5,7 @@ import pandas as pd
 x = []
 y = []
 
-with open ("MurMurAsm.csv", "r") as f:
+with open ("CRCstat.csv", "r") as f:
     for line in f:
         line = line.split(";")
         x = line
@@ -20,7 +20,17 @@ for i in range(len(x)):
     x[i] = int(x[i])
 for i in range(len(x)):
     y.append(i)
-print(x)
+
+elements = 0
+numlists = 0
+
+for i in range(len(x)):
+    if x[i] != 0:
+        elements += x[i]
+        numlists += 1
+
+print("load factor = ", elements/numlists)
+
 
 plt.bar(y,x)
 
