@@ -5,7 +5,7 @@ import pandas as pd
 x = []
 y = []
 
-with open ("Strlenstat.csv", "r") as f:
+with open ("Rorstat.csv", "r") as f:
     for line in f:
         line = line.split(";")
         x = line
@@ -21,11 +21,20 @@ for i in range(len(x)):
 for i in range(len(x)):
     y.append(i)
 
+elements = 0
+lists = 0
+
+for i in range(len(x)):
+    if x[i] != 0:
+        elements += x[i]
+        lists += 1
+
+print("Load factor = ", elements/lists)
 print(np.var(x))
 
 plt.bar(y,x)
 
-plt.title('Plot for Strlen Hash')
+plt.title('Plot for Ror Hash')
 plt.xlabel('Basket')
 plt.ylabel('Collisions')
 
