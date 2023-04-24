@@ -1,7 +1,7 @@
 # HashTable
 ## Goals of this project
 
-In this project i had two main goals:
+In this project I had two main goals:
 1. Creating hashtable for fast word finding.
 2. Optimizing searching algorithm using assembler, SIMD instructions and other methods.
 
@@ -31,7 +31,7 @@ We will test 8 different hash functions in the first part and the best one we wi
 
 # Chapter I: different hash functions
 
-Let's take a take a look at different hash functions, for each one we will look at the amount of collisions in each basket.
+Let's take a look at different hash functions, for each one we will look at the amount of collisions in each basket.
 
 ### Hash, that always returns 1
 
@@ -117,7 +117,7 @@ unsigned int RolHash(const char* input)
 }
 ~~~
 
-ROL plot:
+rolHash plot:
 
 <img align="center"  src="https://user-images.githubusercontent.com/111467660/233705181-5e8434e5-8122-4be2-b350-f75b2f92723d.png">
 
@@ -140,7 +140,7 @@ unsigned int RorHash(const char* input)
 }
 ~~~
 
-ROR plot:
+rorHash plot:
 
 <img align="center"  src="https://user-images.githubusercontent.com/111467660/233705256-ea7f50c1-0213-42bc-9c76-e473f7995c6f.png">
 
@@ -170,7 +170,7 @@ unsigned int CRCHashC(const char* input)
 }
 ~~~
 
-And here's the plot fot it:
+And here's the plot for it:
 
 <img align="center"  src="./lib/CRCstat.png">
 
@@ -234,7 +234,7 @@ Plot for this one looking good:
 
 ## Analysis
 
-In this part we will choose best function from previous ones. Obviously, ones to choose from is this ones: MurMurHash, CRC hash, Rotate left hash, ASCII sum hash. 
+In this part we will choose the best function from previous ones. Obviously, ones to choose from is this ones: MurMurHash, CRC hash, Rotate left hash, ASCII sum hash. 
 Let's put them all on one plot:
 
 <img align = "center" src = "https://user-images.githubusercontent.com/111467660/233719610-1ccf95c7-c7b4-4933-92ed-dc3e965c0436.png">
@@ -421,7 +421,7 @@ In our case: D = 16.2
 | Optimization1 |   32 089 240 018           |   0.52                | 0.52                   |
 | Optimization2 |   16 260 100 266           |   1.05                | 1.76                   |
 
-Finally, we were able te get some speed growth. This optimization remains in place.
+Finally, we were able to get some speed growth. This optimization remains in place.
 
 ## Optimization 3. Implementing SIMD instructions.
 
