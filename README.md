@@ -18,7 +18,7 @@ For this we will need some extra definitions:
 * **Collision** - case, where two different keys have the same hashvalue.
 * **Load factor** - average size of baskets in the hashtable.
 
-In this project **hashtable** is a table of linked lists and a hash functions attached to it. This method of constructing hashtable is called **chainging method**.
+In this project **hashtable** is a table of linked lists and a hash function attached to it. This method of constructing hashtable is called **chaining method**.
 
 Here's the example of hashtable, where hashfunction is a first letter of a word and keys are these words: "Emperor", "Horus", "Heresy", "Korvus". You can notice that the list with the letter A is empty, because no words, starting with the same letter was given. Same happens to all other letters, excluding E, H, K.
 <img align = "center" src = "https://user-images.githubusercontent.com/111467660/233713336-2b2c9d21-c7b1-4783-9e83-4e659dfb0491.png">
