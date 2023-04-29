@@ -13,10 +13,10 @@ For this we will need some extra definitions:
 * **Key** - Any non-null object, in this project we will use strings as keys.
 * **Hashvalue** - value for the corresponding key.
 * **Hash Function** - function, that calculates hashvalue by given key.
-* **Basket** - list in the hashtable.
-* **Capacity** - number of baskets in the hashtable.
+* **Bucket** - list in the hashtable.
+* **Capacity** - number of buckets in the hashtable.
 * **Collision** - case, where two different keys have the same hashvalue.
-* **Load factor** - average size of baskets in the hashtable.
+* **Load factor** - average size of buckets in the hashtable.
 
 In this project **hashtable** is a table of linked lists and a hash function attached to it. This method of constructing hashtable is called **chaining method**.
 
@@ -24,14 +24,14 @@ Here's the example of hashtable, where hashfunction is a first letter of a word 
 <img align = "center" src = "https://user-images.githubusercontent.com/111467660/233713336-2b2c9d21-c7b1-4783-9e83-4e659dfb0491.png">
 
 
-We will use text of Hamlet by William Shakespeare for filling the hashtable. For each word we will first count hashvalue of it, then put it to corresponding basket.
+We will use text of Hamlet by William Shakespeare for filling the hashtable. For each word we will first count hashvalue of it, then put it to corresponding bucket.
 
 
 We will test 8 different hash functions in the first part and the best one we will optimize in the second part.
 
 # Chapter I: different hash functions
 
-Let's take a look at different hash functions, for each one we will look at the amount of collisions in each basket.
+Let's take a look at different hash functions, for each one we will look at the amount of collisions in each bucket.
 
 ### Hash, that always returns 1
 
