@@ -1,8 +1,8 @@
 # HashTable
 ## Goals of this project
 
-In this project I had two main goals:
-1. Creating hashtable for fast word finding.
+In this project we had two main goals:
+1. Implementing hashtable for fast word finding.
 2. Optimizing searching algorithm using assembler, SIMD instructions and other methods.
 
 ## What is hashtable
@@ -12,8 +12,8 @@ Let's start by defining, what is hashtable actually.
 For this we will need some extra definitions:
 * **Key** - Any non-null object, in this project we will use strings as keys.
 * **Hashvalue** - value for the corresponding key.
-* **Hash Function** - function, that calculates hashvalue by given key.
-* **Bucket** - list in the hashtable.
+* **Hash Function** - function, that calculates hashvalue by given a key.
+* **Bucket** - a list in the hashtable.
 * **Capacity** - number of buckets in the hashtable.
 * **Collision** - case, where two different keys have the same hashvalue.
 * **Load factor** - average size of buckets in the hashtable.
@@ -256,14 +256,14 @@ From this data we can conclude: MurMurHash is the best. Let's choose it as a has
 
 ## Experiment explanation
 
-First of all, let's set out experiment conditions. As stated earlier, we will use text of Hamlet, written by William Shakespear to load the hashtable. Capacity of the hashtable will be 1000 baskets. Each word will be searched 10000 times. Using `callgrind` we will find hot spots of our programm. Programm will be compiled with `-O3` flag.
+First of all, let's set out experiment conditions. As stated earlier, we used text of Hamlet, written by William Shakespear to load the hashtable. Capacity of the hashtable would 1000 baskets. Each word would be searched 10000 times. Using `callgrind` we found hot spots of our programm. Programm would be compiled with `-O3` flag.
 
 ## Base version
 
 Before starting, let's take a look at a base variant of our programm.
 
 <details>
-<summary> Callgrind layout for base version </summary>
+<summary> Callgrind data for base version </summary>
 <img alilgn = "center" src = "https://user-images.githubusercontent.com/111467660/233328188-d00ee97e-9390-4815-ad5d-2161c0f941a6.png">
 </details>
 
@@ -311,7 +311,7 @@ int inline strcmp_asm (const char* str1, const char* str2)
 
 
 <details>
-<summary> Callgrind layout for optimization 1 </summary>
+<summary> Callgrind data for optimization 1 </summary>
 <img align = "center" src= "https://user-images.githubusercontent.com/111467660/233327686-d4647e95-3b05-419f-8bff-89d387caed5f.png">
 </details>
 
@@ -320,7 +320,7 @@ int inline strcmp_asm (const char* str1, const char* str2)
 | No optimization |   16 740 227 454           |   1                | 1                   |
 | Optimization1 |   32 089 240 018           |   0.59                | 0.59                   |
 
-We can notice significant drawback at programm speed, because of it we will not use this optimization later.
+We can notice significant drawback at programm speed, being wise, we will drop this optimization.
 
 <details>
 <summary> Additional research for this optimization </summary>
@@ -405,7 +405,7 @@ BASE equ 0x5bd1e995
 
 
 <details>
-<summary> Callgrind layout for optimization 2 </summary>
+<summary> Callgrind data for optimization 2 </summary>
 <img align="center" src = "https://user-images.githubusercontent.com/111467660/233326565-2b4820fa-401f-41a4-8689-d0d4ef84fffb.png">
 </details>
 
@@ -425,7 +425,7 @@ Finally, we were able to get some speed growth. This optimization remains in pla
 
 ## Optimization 3. Implementing SIMD instructions.
 
-In this optimization we will use SIMD instructions, you can read about them [here](https://github.com/aleksplast/SIMD)
+In this optimization we used SIMD instructions, you can read about them [here](https://github.com/aleksplast/SIMD)
 
 Let's take a closer look at given text. Maximal word lenght in it is 13 symbols. Let's edit given file, adding each word up to 16 symbols. Now we can change our key format to __m128i. With it we can change strcmp function to intrinsic analogue.
 
@@ -451,7 +451,7 @@ SearchStatus FindByHash(HashTable* hashtable, __m128i input)
 ~~~
 
 <details>
-<summary> Callgrind layout for optimization 3 </summary>
+<summary> Callgrind data for optimization 3 </summary>
 <img align="center" src = "https://user-images.githubusercontent.com/111467660/233380329-b0ac6363-b658-40c1-85e0-0e3eef4575a8.png">
 </details>
 
@@ -464,7 +464,7 @@ SearchStatus FindByHash(HashTable* hashtable, __m128i input)
 
 ## Optimization 4. Changing hash function.
 
-In this part, we will try to change our hash function. Let's consider CRC function as an opponent to MurMurHash. CRC is faster, but has roughly the same load factor. Also, it has an in-built instrinsic function for faster calculation. We are lucky, because in previous step we changed all keys to __m128i format.
+In this part, we tried to change our hash function. Let's consider CRC function as an opponent to MurMurHash. CRC is faster, but has roughly the same load factor. Also, it has an in-built instrinsic function for faster calculation. We are lucky, because in previous step we changed all keys to __m128i format.
 
 Now, our hash function looks like this:
 
@@ -484,7 +484,7 @@ unsigned int CRCHash(__m128i input)
 ~~~
 
 <details>
-<summary> Callgrind layout for optimization 4 </summary>
+<summary> Callgrind data for optimization 4 </summary>
 <img align="center" src = "https://user-images.githubusercontent.com/111467660/233384477-5795e4bc-9ce6-4658-8883-761dd4e29cdf.png">
 </details>
 
@@ -498,7 +498,7 @@ unsigned int CRCHash(__m128i input)
 
 ## Optimization 5. Reducing load factor.
 
-In this part we will reduce load factor. It is the most obvious way to optimize hash function. Maybe you were asking yourself: "Why didn't we do it in the first place?". 
+In this part we reduced load factor. It is the most obvious way to optimize hash function. Maybe you were asking yourself: "Why didn't we do it in the first place?". 
 Of course, we will increase our programm speed, but this comes at cost too. We will need more memory for this hashtable. Also, with low load factor we will find words almost instantly, thus there will be nothing left to optimize. This optimization is the last one in educational purposes. 
 
 Let's change capacity of our hashtable to 8000, load factor will be around 2.
