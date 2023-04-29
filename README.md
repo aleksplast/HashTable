@@ -324,9 +324,9 @@ We can notice significant drawback at programm speed, being wise, we will drop t
 
 <details>
 <summary> Additional research for this optimization </summary>
-During my research, I was also doing some test with -O1 optimization flag.
+During our research, we were also doing some test with -O1 optimization flag.
 
-In this variant, comparing to `-O3` variant, I was able to get some speed up.
+In this variant, comparing to `-O3` variant, we were able to get some speed up.
 
 | Optimization | Speed growth  |
 | :----------: | :-------------------: |
