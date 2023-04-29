@@ -96,7 +96,7 @@ unsigned int HashReturnSumASCII(const char* input)
 
 And here comes the plot:
 
-<img align="center"  src="./lib/ASCIIsum.png">
+<img align="center"  src="https://user-images.githubusercontent.com/111467660/235300647-504f710d-28cb-424e-82cd-459e0c2c92db.png">
 
 >Dispersion = 90.73, Load factor = 9.51
 
