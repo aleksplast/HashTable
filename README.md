@@ -504,7 +504,7 @@ Of course, we will increase our programm speed, but this comes at cost too. We w
 Let's change capacity of our hashtable to 8000, load factor will be around 2.
 
 <details>
-<summary> Callgrind layout for optimization 5 </summary>
+<summary> Callgrind data for optimization 5 </summary>
 <img align="center" src = "https://user-images.githubusercontent.com/111467660/233389526-f59a559d-bb84-4870-90cd-982a66ae4218.png">
 </details>
 
