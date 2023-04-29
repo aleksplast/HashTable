@@ -275,7 +275,7 @@ Let's put base variant into the table.
 
 ## Optimization 1. Inline assembly of strcmp.
 
-As we can see from callgrind layout for our base version, most hot spot is strcmp function. Let's try to optimize it by doing an inline assembly of our strcmp.
+As we can see from callgrind layout for our base version, first hot spot is strcmp function. Let's try to optimize it by doing an inline assembly of our strcmp.
 
 Code for it goes like this:
 
